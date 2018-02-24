@@ -1,0 +1,68 @@
+1.Introducing JEE & Eclipse
+  Java Enterprise Edition (JEE)
+   JEE is a collection of many different specifications intended to perform specific tasks.
+   JEE specifications can be broadly classified in the following groups:
+    PRESENTATION LAYER: 
+     JEE specifications or technologies in this group receive the request from web server and send back the response HTML/JSON/XML.
+     -> Servlets, JSP, JSF
+    BUSINESS LAYER: 
+     Handle the business logic of your application generally the request to this layer comes from 
+     the Presentation Layer/Middle Layer (Web Services). 
+     Classes in this layer are executed in application containers (GlassFish/WebSphere/Tomcat)
+      ENTERPRISE JAVA BEANS: Are Java classes where you can write your business logic.
+       EJB are not strict required but they provide many of the services that are essential 
+       (security/transaction mgmt, component lookup, object pooling)
+        -> Session Beans:
+        -> Message Driven Beans: Java Messaging Service (JSM)
+    ENTERPRISE INTEGRATION LAYER
+      APIS in this layer are used for interacting with external (to JEE application) systems in Enterprise.
+      Java Database Connectivity (JDBC)
+      The Java Persistence API (JPA)
+      Java Connector Architecture
+      Web Services  SOAP/REST
+  
+  Eclipse IDE
+   (source control syste/build tools/file explorer/managing servers/database explorer/memory|cpu profiler)
+   Along with editor support, Eclipse has plugins to interact with many of the external
+   systems used during development. For example, source control systems such as SVN and
+   Git, build tools such as Apache Ant and Maven, file explorer for remote systems using
+   FTP, managing servers such as Tomcat and GlassFish, database explorer, memory and
+   CPU profiler, and so on.  
+   -> Workspace/Plugins/Editors and Views/Perspectives/Eclipse Preferences  
+  Tomcat -> Don't Support EJB
+   Tomcat is a Web Container. It supports APIs in the presentation layer, it also supports JDBC and JPA also. 
+   ...
+  GlassFish
+   GlassFish comes in two flavors: Web Profile and Full Platform. 
+   Web Profile is like Tomcat, which does not include EJB support. So download Full Platform
+   %GLASSFISH_HOME%: 'C:\Program Files\glassfish-4.1.1\'
+    -> Define ports: glassfish/domains/domain1/config/domain.xml
+    -> Start server: glassfish/bin/glassfish/bin/startserv.bat
+       index.html -> glassfish/domains/domain1/docroot/index.html
+       => Go to Administration Console
+  MySql
+    Installing MySQL for Windows
+      1.Accept License Agreement
+      2.Select the Custom option and click on Next.
+        Select... 
+          MySQL Server 
+          MySQL Workbench 
+        ...and complete the installation.
+      3.MySQL Server Configuration
+          Config Type: Development Machine
+          Connectivity: 
+            TCP/IP  
+            Port Number: 3306 
+            [CHECK] Open Firewall por for network access
+          Account and Roles: 
+            MySQL Root Password: root
+            Custom User: admin/admin
+         -> Make sure you select All Hosts when adding a user so that you are able to access
+            MySQL database from any remote machine that has network access to the machine
+            where MySQL is installed.
+    Creating MySQL users
+     You can create MySQL user either the Command Prompt or by using MySQL Workbench.
+      Command Prompt: 
+        mysql -u root -p <root_password>
+
+
