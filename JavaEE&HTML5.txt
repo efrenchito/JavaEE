@@ -1,0 +1,44 @@
+https://www.mhprofessional.com/oraclepressbooks/downloads_list
+
+@Chapter2: PERSISTENCE
+    Overview
+      There are many ways to persist data in Java. 
+      Java Platform, Standard Edition (Java SE) provides APIs to manipulate streams and files.
+      The Java Database Connectivity (JDBC) API can be used to store data to a relational database.
+      Different NoSQL data stores provide APIs to manage data specific to those data stores.
+    
+      The Java EE platform provides the Java Persistence API (JPA) for the management of persistence and object/relational mapping.
+       -> In other words, a POJO (Plain Old Java Object) can be used to represent a table in the relational database, 
+  	      and each class instance corresponds to a row in that table.
+    
+      Data stored in a relational database should maintain ACID (atomicity, consistency, isolation, durability) properties.
+      To help ensure that ACID properties are maintained any CRUD operation should be done within a transactional boundary.
+      The transactions can be container-managed or user-managed.
+      .Container-Managed transactions: 
+       (Automatically started by the container and then either committed/rolled back by the container.)
+        -> Enterprise JavaBeans (EJB) container 
+	    -> @javax.transaction.Transactional annotation provided by the Java Transaction API (JTA).
+      .User-Managed transactions: (Explicitly started and completed by the user.)
+
+    JPA Entity
+      JPA defines an entity as a lightweight persistent domain object
+      Any POJO with a no-args public constructor can be defined as an entity.
+
+      	Annotations<@Entity|@Table|@Id|@NotNull|@Size(min=1, max=20)>
+      	  @javax.persistence.Entity
+      	  @javax.persistence.Table
+      	  @javax.persistence.Column
+      	  @javax.persistence.Id 
+      	    -> any Java primitive/wrapper|java.lang.String|java.util.Date|java.sql.Date|java.math.BigDecimal|java.math.BigInteger
+      	  @javax.validation.constraints.NotNull
+      	  @javax.validation.constraints.Size
+      	  @javax.persistence.OneToOne
+      	  @javax.persistence.OneToMany
+		  @javax.persistence.ManyToOne
+		  @javax.persistence.ManyToMany
+		  @javax.persistence.JoinTable
+		  @javax.persistence.CollectionTable
+
+
+    Packaging an Entity
+    Managing an Entity
