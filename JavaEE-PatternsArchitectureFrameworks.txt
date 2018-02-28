@@ -1,0 +1,282 @@
+O'Reilly -> https://www.safaribooksonline.com/library/view/java-ee-made/9781789138146/video3_4.html
+JAVA EE MADE EASY - PATTERNS, ARCHITECTURE AND FRAMEWORKS: High Level Architecture: Model 2 MVC Architecture
+https://github.com/in28minutes/SpringMvcStepByStep
+https://github.com/in28minutes/JavaWebApplicationStepByStep
+https://github.com/in28minutes/Struts2StepByStep
+https://github.com/in28minutes/JavaObjectOrientedProgramming
+
+Java EE Architecture & Patterns: Architecture,Design,Web,Business,Integration,Others
+
+Architecture:
+  	Model1:
+  	    -> Architecture
+  	        Browser <-> JSP1/n <-> Model
+  	        ...
+  	Model2(MVC):  
+     	-> Architecture
+     	    Browser <-> Servlet -> Model
+               |    <-   View   
+  	Front Controller: 
+  		-> Architecture
+  	        Browser <-> Front.Controller  <-> Servlet -> Model
+                               |          <-   View
+        -> Sample
+            //web.xml
+             ...
+              <servlet>
+                <servlet-name>dispatcher</servlet-name>
+                <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+                <init-param>
+                  <param-name>contextConfigLocation</param-name>
+                  <param-value>/WEB-INF/todo-servlet.xml</param-value>
+                </init-param>
+                <load-on-startup>1</load-on-startup>
+              </servlet>
+              <servlet-mapping>
+                <servlet-name>dispatcher</servlet-name>
+                <url-pattern>/</url-pattern>
+              </servlet-mapping>
+            //DispatcherServlet.java  
+              /*If you look at it's hierarchy it extends HttpServlet, so it's basically a normal HttpServlet
+                (extends FrameworkServlet extends HttpServletBean extends HttpServlet extends GenericServlet extends Object)
+                But this DispatcherServlet when using SpringMVC act as the FrontController, so all the incoming request goes
+                through the DispatcherServlet in SpringMVC, so if you look on our web.xml the only servlet registered is the 
+                DispatcherServlet will go through this FrontController.
+                The DispatcherServlet works based on the URL:
+              */
+              ...
+               @RequestMapping(value = "/add-todo", method = RequestMethod.GET)
+               public String showTodoPage(ModelMap model) {
+                 model.addAttribute("todo", new Todo(0, retrieveLoggedinUs))
+               }
+              /*so DistpatcherServlet decides which Controller servlet to invokes based on what's in the request @HandlerMapping
+                which view to redirect to and how to identify that view
+                Exception handling...
+                Internationalization
+                theme resolution strategy..
+                -> All these features are implemented in the DispatcherServlet there by the others controllers don't need to really
+                worry about it.
+              */ 
+  	Multi Layered Application
+  	 In a Java EE Typical Architecture you have multiple layers:
+  	  The Flow is very simple, when ever a request is made, it comes to the WEB layer, it might be a MVC/Front Controller pattern
+  	  the controller will then invoke the business logic, the Business layer will then invoke the Data/Integration layers to 
+  	  obtain all the data it needs and add the business logic and then returns that data back to the controller, the controller
+  	  will then make that data available as a model to the view and the View will use the model and show the data on the screen.
+
+  	    WEB: Controllers controll the flow of our Web Application. 
+  	         Decides which business logic to call, which view to show, how to get the model ready, all that kind of logic is in 
+  	         the Web layer. Handling a Request and send the response back.
+  	    BUSINESS: Add logic to the data layer...
+  	     Let's say I wan't to know how many of the ToDOs are pending
+  	     so it add logic to data recolected
+  	    DATA: Concerns with how to get the data from the database, should I use JDBC/JPA/Hibernate...
+  	     Making an update to the database, all that kind of stuff...
+  	     ...
+  	    INTEGRATION: Help us comunicate to other applications
+  	      Consuming web-services, putting Messages on the Queue
+  	      ...
+  	   -> The reason we have those layers is SEPARATION OF CONCERNS
+  	Big Picture: Layers, Frameworks and Specification
+  	  WEB: Servlet, JSP
+  	   MVC,Spring MVC, Struts
+  	   View, JSP, EL, JSTL, Freemarker, JSF, Velocity
+  	   Alternatives, AngularJS, WebServices, Spring Rest
+  	  BUSINESS: EJB, Spring
+  	  DATA: JDBC, Spring Data, IBatis, Hibernate
+  	  INTEGRATION: WebServices, MQ, JMS
+  	Distributed System
+  	 A Distributed System is where the different layers of the application might be in a different system.
+  	 In certains system you may have the Business and the Data layers togethers in others don't.
+  	 ...
+  	Coupling
+  	 Coupling is a measure of how much a component is dependend in another component.
+  	 You con refer to Coupling in a Class/Layer Level
+  	 ...
+  	Cohesion
+  	 Cohesion is a measure of how related the responsabilities of a component are
+  	 Applies to Classes/Layers & Components
+    Cross Cutting Concerns
+     Are thos concerns which are not restricted	to a specific layer
+     Functionalities that concern to all the layers, this kind of functionality	is called Cross Cutting Concerns
+      ... Login/Authentication/Time Spend
+      To solve that kind of things => Aspect Oriented Programming
+Web Layer:
+    Introduction to Scriptlets, JSTL and EL
+    Front Controller and Application Controller Patterns
+      WelcomeController.java
+      LogoutController.java 
+      TodoController.java
+    View Helper - Java EE Pattern
+      When ever you talk about an application there are two kinds of logic 
+        Business Logic: How to calculate the amount after discount
+        View Logic: How do you format a date/currency on the screen to the user based on the country where the user is coming from
+         How do I validate things in a form.
+         Types: Tag Libraries (JSTL/Spring Tags)
+            //list-todos.jsp
+             ...
+                <c:forEach items="${todos}" var="todo">
+                 <tr>
+                   <td>${todo.desc}</td>
+                   <td><fmt:formatDate pattern="dd/MM/yyyy" value="${todo.targetDate}" /></td>
+                   <td>${todo.done}</td>
+                   <td><a href="/update-todo?id=${todo.id}" class="btn btn-success">Update</a>
+                       <a href="/delete-todo?id=${todo.id}" class="btn btn-delete">Delete</a>
+                 </tr>
+                </c:forEach>
+              </tbody>
+             </table>
+             <div><a class="btn btn-success" href="/add-todo">Add</a></div>  
+    Composite View
+     Is separating the layout from the 
+        //list-todos.jsp
+         <%@ include file="common/header.jspf"%>
+         <%@ include file="common/navigation.jspf"%>
+
+         <div class="container">
+          <table class="table table-striped">
+           <caption><spring:message code="todo.caption"/></caption>
+           <thread>
+            <tr>
+              <th>Description</th>
+              <th>Target Date</th>
+              <th>Is Completed?</th>
+              <th></th>
+            </tr>
+           </thread>
+           <tbody>
+            <c:forEach items="${todos}" var="todo">
+             <tr>
+              <td>${todo.desc}</td>
+              <td><fmt:formatDate pattern="dd/MM/yyyy" value="${todo.targetDate}" /></td>
+              <td>${todo.done}</td>
+              <td><a href="/update-todo?id=${todo.id}" class="btn btn-success">Update</a>
+                  <a href="/delete-todo?id=${todo.id}" class="btn btn-delete">Delete</a>
+             </tr>
+            </c:forEach>
+           </tbody>
+          </table>
+         <div><a class="btn btn-success" href="/add-todo">Add</a></div>
+    Context Object
+     In general Context Object decouples software components from protocols specific implementations.
+     Avoids tight coupling between the Presentation Tier and the Servlet API
+     Allow Controllers to handle other kinds of requests say Mobile App
+     Spring MVC: Command Object/ModelMap/ModelAndView
+        //TodoController.java
+         ...
+         @RequestMapping(value = "/add-todo", method=RequestMethod.POST)
+         public String addTodo(ModelMap model, @Valid Todo todo, BindingRequest...
+
+     When the HttpRequest comes to the DispatcherServlet handles it to the Model Object (POJO), now the Controller
+     doesn't have any binding directly to the HttpRequest/HttpResponse it handles this through a Model Object and there by
+     weare not tight to the request
+    Intercepting Filter
+     This is directly a concept which is already part of JEE (Filter).
+     Only authenticated users can have access to resources.
+     In order to achieve this we can: 
+     -> To validate in every controller check if the user is authenticated.
+     -> The other option is intercept the request to this controllers and in between write a filter to check if the user is 
+     authenticated or not (redirecting to login page or requested page as correspond).
+     Structs2 Framework is completely based on Intercepting Filters/Spring Security is actually implemented as a Filter.
+        //web.xml
+         <?xml version="1.0" encoding="utf-8"?>
+         <web-app>
+          ...
+          <filter>
+           <filter-name>springSecurityFilterChain</filter-name>
+           <filter-class>org.springFramework.web.filter.DelegatingFilterProxy</filter-class>
+          </filter>
+          <filter-mapping>
+           <filter-name>springSecurityFilterChain</filter-name>
+           <url-pattern>/*</url-pattern>
+          </filter-mapping>
+          <error-page>
+            <location>/WEB-INF/views/jsp/error.jsp</locatio>
+          </error-page>
+         </web-app> 
+        //LoginRequiredFilter.java
+         ...
+          @WebFilter(urlPatterns="*.do")
+          public class LoginRequiredFilter implements Filter {
+
+            @Override
+            public void destroy(){
+
+            }
+
+            @Override
+            public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain chain)
+              throws IOException, ServletException {
+              HttpServletRequest request = (HttpServletRequest)servletRequest...
+              if(request.getSession().getAttribute("name") != null){
+                chain.doFilter(servletRequest, servletResponse);
+              }else{
+                request.getRequestDispatcher("/login.do").forward(servletRequest, servletResponse);
+              }
+            }
+          ...
+Business Layer
+    Domain Model
+    EJB
+     EJB1 & EJB2 were initially famous but very complex/EJB3 -> POJO -> More simples now 
+     The two big advantages provided by EJB:
+      1. Distributed Systems->With EJB you can build a Business Service and deploy as a separated component in a different system.
+      2. They take care of transaction management
+    JTA
+     Transactions prevent a system being in an inconsistent state.
+     In summary when you have a set of steps, either all the steps should succede otherwise none of them could succede
+    Facade
+     Usually when we talk about different web applications in a single page probably you would show a lot of thinks, and every 
+     one of those thinks might need a call to the business layer. If these Business Layer is in a distributed system it would 
+     mean multiple round rips - Account/User information. Instead of exposing five grained interfaces we'll create somethink 
+     called a Facade. A Facade is something on the Business Layer which gets data for a particular screen combined it as a single 
+     object. The advantage of Facade Pattern is obviouslly better performance and also Facade reduces Coupling
+    DTO/VO 
+     Stands for Data Transfer Object/Value Object 
+     Are basically used to transfer infrormation between different layers, tipically the Web Layer and Business Layer.
+     DTO is basically the summary of data which is needed by the view. I page might need different kind of information, so you 
+     create one object which contains all the different information that you need in a view and that's the output of your facade
+     and that's the Data Transfer Object/Value object.
+    Service Locator 
+     Earlier perfoming JNDI Lookup was complex, same with JMS/EJB
+     The Java Service Locator allow us to identify a Distributed/JDNI resource, now with Dependency Injection Java Service Locator is mostly obsolete.
+Data/Integration Layer
+    JMS, JAX-WS, JAX-RS, and JAXB
+     Tipycally when you're dealing with a Data/Integration Layer you're dealing with a Database or an External System.
+     How do we acomplish that? tipycally with HTTP Services or Messaging Services exposes on a Queue (JMS).
+     When I need to talk with an external System using Web Service, the Web Service can either be using XML or JSON.
+        -> JAXB (Java Architecture for XML Binding)
+         Help us to convert Java Object into an XML, and the XML which I get back as response from the service to a Java Object 
+        -> JAX-WS (Java API for XML Web Services)
+         Is how you expose/consume an XML WebService, so you use JAX-WS along with JAXB when you talk with an XML Web Service
+        -> JAX-RS (Java API for RESTful Web Service)
+         It specify how you can expose/consume a RESTful Web Service
+        -> JMS 
+         Specify how you can talk to an External System over a Queue
+    JNDI, JDBC, ORM, JPA
+        -> JNDI (Java Naming and Directory Interface)
+         In Enterprise Application a when I need to access a Database Connection, JNDI provides that connection as a resource
+         so it will receive a name for example "JDBC/myDatabaseConnection", so that is not directly coupled to the database-
+         JNDI will help me the lookup what is refered to <resource_name>, so it will return me that as an Object Resource, so
+         it's kind of a Directory Service, this will similar to QUEUES.
+        -> JDBC (Java Database Connectivity)
+         Allow us to open a connection execute a SQL sentence/procedure, retrieve the result and mapped to an object
+         ...
+        -> ORM (Object Relational Mapping)
+         Map Java Objects to a Relational Databases
+         ...
+        -> JPA (Java Persistence API)
+         Provides an Object/relational mapping facility for managing relational data in Java applications
+         Is the formal API for ORMs
+         Four important parts:
+          - Mapping
+          - Query Language
+          - Criteria Application
+          - JPA API
+    Java EE Pattern - Data Access Object (DAO)
+     Is basically responsible for get a reference to the Database connection and how to get the data from that Database.
+     ...
+    Java EE Pattern - Service Activator
+     Some use cases take long time to run
+     Instead of Blocking user, these can be run asynchronously
+     Implementations -> Threads/JMS/Job Farm
