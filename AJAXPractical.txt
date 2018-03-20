@@ -1,0 +1,84 @@
+PART 1 ■ ■ ■ Programming Using Ajax and Java
+01.Ajax: The Brave New World
+    ■ A Brief History of Web Development: The “Classic” Model 
+	■ What Is “Wrong” with the Classic Web?
+	■ Enter Ajax
+	■ Why Is Ajax a Paradigm Shift? On the Road to RIAs
+	■ Let’s Get to It: Our First Ajax Example
+	    //FirstAjaxCode
+	     //Instantiate an XMLHttpRequest object.
+		 if(window.XMLHttpRequest) {
+		    xhr = new XMLHttpRequest();
+		 } else {
+		   xhr = new ActiveXObject("Microsoft.XMLHTTP");
+		 }
+ 
+		 document.getElementById("selShow").value;    //getValue
+		 document.getElementById("divCharacters").innerHTML  = xmlHttpRequest.responseText;  //setValue
+ 
+		 The XMLHttpRequest object, is creation of Microsoft (believe it or not!) is nothing more than a proxy to a socket. 
+		 It has a few (very few) methods and properties, but that is one of the benefits: it really is a very simple beast.
+		onChange event 
+		 What happens if more than one onChange event fires at close to the same time?
+		 Essentially, the first will be lost because a new XMLHttpRequest object is spawned, and xhr will
+		 point to it. Worse still, because of the asynchronous nature of XMLHttpRequest, a situation can
+		 arise where the callback function for the first request is executing when the reference is null,
+		 which means that callback would throw errors due to trying to reference a null object.If that
+		 was not bad enough, this will be the case only in some browsers, but not all (although my
+		 research indicates most would throw errors), so it might not even be a consistent problem.
+		   -> This is a good example of why.That being said, it is actually many times perfectly acceptable to simply 
+		 instantiate a new instance and start a new request.
+		callback handler
+		 The next step we need to accomplish is telling the XMLHttpRequest instance what callback
+		 handler function to use. An Ajax request has a well-defined and specific lifecycle, just like any
+		 HTTP request. This cycle is defined as the transitions between ready states (onreadystatechange)
+		 At specific intervals in this lifecycle, the JavaScript function you name as the callback handler will be called.
+		 Our callback handler function this time around does very little. 
+		 First, it checks the readystate of the XMLHttpRequest object.
+		 When the callback is called as a result of the request completing, we simply set the innerHTML 
+		 property of the <div> on the page with the ID divCharacters to the text that was returned.
+		open(HTTP method,  URL,  asynchronously[true|false] )
+		 That is one of the drawbacks of XMLHttpRequest: you take
+		 full responsibility for marshalling and unmarshalling data sent and received.
+	■ Choices in Ajax Toolkits 
+	 The libraries we'll be covering are:
+	  .Dojo (http://dojotoolkit.org)
+	  .DWR (http://getahead.ltd.uk/dwr)
+	  .Prototype (http://prototype.conio.net)
+	  .the AjaxTags component of the Java Web Parts project (http://javawebparts.sourceforge.net). 
+	  All of these are free, open source toolkits that people are finding very useful in their Ajax work. 
+	  This is only a very small subset of the libraries and toolkits available, but they probably represent the most popular
+	■ Alternatives to Ajax
+	  There are other ways to accomplish the goals of building RIAs than using Ajax.
+	  What are the negatives about Flash?
+	   First.  it has a bit of a bad reputation because it is so easy to abuse. (Blocked/NOT installed)
+	   Second. it is not completely “typical” programming. -> learning curve for “traditional” developers
+	   Third.  it can be somewhat heavyweight for users not on broadband connections
+	   Lastly. Flash is owned by Adobe, and is not open source
+02.The Pillars of Ajax
+    ■ JavaScript Basics
+    ■ Object-Oriented JavaScript, or Making JavaScript “Non-Kiddie-Like”
+    ■ The Document Object Model and Scripting: Manipulating Content on the Fly
+    ■ XML: The Language of Languages
+    ■ Parsing XML in JavaScript
+    ■ Cascading Stylesheets
+    ■ Summary
+03.The Server Side of the Equation
+    ■ The Project Development Environment
+    ■ Ant: Building Java Applications the Open Source Way
+    ■ Apache Tomcat: Something for Nothing!
+    ■ Webapps, Servlets, JSPs, and Parsing XML on the Server
+    ■ Installing and Playing with the Applications
+    ■ Summary
+
+PART 2 ■ ■ ■ The Projects
+04.Karnak: Type-Ahead Suggestions
+05.InstaMail: An Ajax-Based Webmail Client
+06.AjaxReader: Because Every Ajax Book has to have One!
+07.PhotoShare: Share Your Visual Life with Your Friends
+08.The Organizer: Get Yourself Organized Now!
+09.AjaxChat: Chatting, the Ajax Way!
+10.AJAX Warrior: Back to the Future in a Fun Way!
+
+APPENDIX A The XMLHttpRequest Object
+APPENDIX B Libraries,Websites, and Books, Oh My!

@@ -1,0 +1,544 @@
+Java EE 7 Essentials
+https://blogs.oracle.com/java/building-a-3-tiered-application-with-java-ee
+https://github.com/myfear/movieplex7
+https://javaee.github.io/glassfish/
+
+
+1.Java Platform, Enterprise Edition
+2.Servlets
+  Servlets are defined as JSR 340, and the complete especification can be downloaded 
+   -> https://jcp.org/aboutJava/communityprocess/final/jsr340/index.html
+  A servlet is a web component hosted in a servlet container and generates dynamic content. 
+  The web clients interact with a servlet using a request/response pattern.
+  
+  HTTPServlet
+    @WebServlet
+     A servlet is defined using the @WebServlet annotation on a POJO, and must extend the javax.servlet.http.HttpServlet class.
+     -> The fully qualified class name is the default servlet name, and may be overridden using the name attribute annotation
+     -> The @WebInitParam can be used to specify an initialization parameter:
+     -> The HttpServlet has one doXXX method to handle each of HTTP GET, POST, PUT, DELETE, HEAD, OPTIONS, & TRACE requests
+     -> The request parameters; HTTP headers; different parts of the path such as host, port, and context; 
+        and much more information is available from HttpServletRequest.
+     -> The developer is responsible for populating the HttpServletResponse, 
+        and the container then transmits the captured HTTP headers and/or the message body to the client.
+     -> The HTTP cookies can be sent and retrieved as well.
+        //SampleServletAnnotation
+         import javax.servlet.http.HttpServlet;
+         import javax.servlet.http.HttpRequest;
+         import javax.servelt.http.HttpResponse;
+         import javax.servlet.ServletException;
+         import java.io.IOException;
+    
+         /*@WebServlet("/account")*/
+         @WebServlet( urlPatterns={"/account", "/accountServlet"}
+                     ,initParams={@WebInitParam(name="type", value="checking")})
+         public class AccountServlet extends javax.servlet.http.HttpServlet {
+           try (PrintWriter out = response.getWriter()) {
+             out.println("<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0 Transaction//EN'>);
+             out.println("<html>");
+             out.println("  <head>");
+             out.println("    <title>My First Servlet</title>");
+             out.println("  </head>");
+             out.println("  <body>");
+             out.println<("   <h1>My First Servlet</h1>");
+    
+             /*REQUEST PARAMETERs
+             http://. . ./account?tx=10
+             In both GET and POST requests, these parameters can be obtained from HttpServletRequest:*/
+             request.getParameter("tx");  
+    
+             /*INIT PARAMS
+             Initialization parameters (init params), may be defined on a servlet to store startup and configuration information.
+             @WebInitParam is used to specify init params for a servlet
+             To manipulate the default behavior of the servlet’s life-cycle call methods by overriding the init, service, and destroy 
+             methods of the javax.servlet.Servlet. -> Typically, database connections are initialized in init and released in destroy.
+             */
+             @Override
+		     public void init(ServletConfig config) throws ServletException {
+		       type = config.getInitParameter("type");
+		       //. . .
+		     }
+    
+             out.println("  </body>");
+             out.println("</html>");
+           } finally {
+    
+           }
+         }
+        web.xml
+         You can also define a servlet using the servlet and servlet-mapping elements in the deployment descriptor of the web 
+         application, web.xml. The annotations cover most of the common cases, so web.xml is not required in those cases. 
+         But some cases, such as ordering of servlets, can only be done using web.xml. 
+         You can define the Account Servlet using web.xml:  
+            //web.xml
+             <?xml version="1.0" encoding="UTF-8"?>
+             <web-app version="3.1" xmlns="..." xmlns:xsi="..." xsi:schemaLocation="...">
+               <servlet>
+                 <servlet-name>AccountServlet</servlet-name>
+                 <servlet-class>org.javaskills.AccountServlet</servlet-class>
+               </servlet>
+               <servlet-mapping>
+                 <servlet-name>AccountServlet</servlet-name>
+                 <url-pattern>/account</url-pattern>
+               </servlet-mapping>
+             </web-app>
+         If the metadata-complete element in web.xml is true, then the annotations in the class are not processed:
+            //web.xml
+             <web-app version="3.1" xmlns="..." xmlns:xsi="..." xsi:schemaLocation="..." metadata-complete="true">
+			    //. . .
+		     </web-app>
+	    Servlet Context
+	     A servlet is packaged in a web application in a .war file. 
+	     Multiple servlets may be packaged together, and they all share a servlet context.
+	     The ServletContext provides detail about the execution environment of the servlets and is used to communicate with the container (reading a resource packaged in the web application, writing to a logfile, or dispatching a request.)
+	       //ServletContext context = request.getServletContext();
+	    Cross-site scripting
+	     A servlet can send an HTTP cookie, named JSESSIONID, to the client for session tracking. 
+	     This cookie may be marked as HttpOnly, which ensures that the cookie is not exposed to client-side scripting code,
+	       //SessionCookieConfig config = request.getServletContext().getSessionCookieConfig();
+	       //config.setHttpOnly(true);
+	    Session
+	     The HttpSession interface can be used to view and manipulate information about a session
+	       //HttpSession session = request.getSession(true);
+	       -> session.setAttribute & session.getAttribute methods are used to bind objects to the session.
+	    Forward a request
+	        getRequestDispatcher(<servlet-name>).forward(request, response)
+	         //request.getRequestDispatcher("bank").forward(request, response); 
+	         -> Accept a path relative to the current context only
+	        response.sendRedirect()
+	         //response.sendRedirect("http://example.com/SomeOtherServlet"); 
+	         -> The original request object is not available to the redirected URL.
+	         -> The redirect may also be 	marginally slower because it entails two requests from the client
+        ServletContext.addServlet
+         In addition to declaring servlets using @WebServlet and web.xml, you can define them programmatically using 
+         ServletContext.addServlet methods. You can do this from the ServletContainerInitializer.onStartup or 
+         ServletContextListener.context Initialized method.
+     	    //ServletContext.addServlet
+             public class MyInitializer implements ServletContainerInitializer {
+	           @Override
+	             public void onStartup (Set<Class<?>> clazz, ServletContext context) {
+	             ServletRegistration.Dynamic reg = context.addServlet("MyServlet", "org.example.MyServlet");
+	             reg.addMapping("/myServlet");
+	           }
+	         }
+    Servlet Filters
+     A servlet filter may be used to update the request and response payload and header information from and to the servlet. 
+     Authentication, logging, data compression, and encryption are some typical use cases for filters. 
+     You can associate filters with a servlet or with a group of servlets and static content by
+     specifying a URL pattern. You define a filter using the @WebFilter annotation:
+            //WebFilterAnnotation
+          @WebFilter("/*")
+		    public class LoggingFilter implements javax.servlet.Filter {
+		    public void doFilter(HttpServletRequest request, HttpServletResponse response) {
+		      //. . .
+		    }
+		  }
+		  //web.xml
+		    <filter>
+			  <filter-name>LoggingFilter</filter-name>
+			  <filter-class>org.sample.LoggingFilter</filter-class>
+		    </filter>
+			  . . .
+		    <filter-mapping>
+			  <filter-name>LoggingFilter</filter-name>
+		      <url-pattern>/*</url-pattern>
+            </filter-mapping>
+          //ServletContext.addFilter
+            public class MyInitializer implements ServletContainerInitializer {
+			  public void onStartup (Set<Class<?>> clazz, ServletContext context) {
+			    FilterRegistration.Dynamic reg = context.addFilter("LoggingFilter", "org.example.LoggingFilter");
+			    reg.addMappingForUrlPatterns(null, false, "/");
+			  }
+		    }
+    Event Listeners
+     Event listeners provide life-cycle callback events for ServletContext, HttpSession, and ServletRequest objects.
+     These listeners are classes that implement an interface that supports event notifications for state changes in these objects.
+     Each class is annotated with @WebListener, via web.xml , or registered via one of the ServletContext.addListener methods.
+        -> ServletContextListener
+          /*Servlet context listeners listen to the events from resources in that context:*/
+		  @WebListener
+		  public class MyContextListener implements ServletContextListener {
+		    @Override
+		    public void contextInitialized(ServletContextEvent sce) {
+		      ServletContext context = sce.getServletContext();
+		      //. . .
+		    }
+		    @Override
+		    public void contextDestroyed(ServletContextEvent sce) {
+		      //. . .
+		    }
+		  }
+		-> ServletContextAttributeListener
+		  /*The ServletContextAttributeListener is used to listen for attribute changes in the context:*/
+		  public class MyServletContextAttributeListener implements ServletContextAttributeListener {
+		    @Override
+		    public void attributeAdded(ServletContextAttributeEvent event) {
+		      //. . . event.getName();
+		      //. . . event.getValue();
+		    }
+		    @Override
+		    public void attributeRemoved(ServletContextAttributeEvent event) {
+		      //. . .
+		    }
+		    @Override
+		    public void attributeReplaced(ServletContextAttributeEvent event) {
+		      //. . .
+		    }
+		  }
+		-> HttpSessionListener
+		  /*The HttpSessionListener listens to events from resources in that session:*/
+		  @WebListener
+		  public class MySessionListener implements HttpSessionListener {
+		    @Override
+		    public void sessionCreated(HttpSessionEvent hse) {
+		      HttpSession session = hse.getSession();
+		      //. . .
+		    }
+		    @Override
+		    public void sessionDestroyed(HttpSessionEvent hse) {
+		      //. . .
+		    }
+		  }
+		-> HttpSessionActivationListener
+		  /*The HttpSessionActivationListener is used to listen for events when the session is passivated or activated:*/
+		  public class MyHttpSessionActivationListener implements HttpSessionActivationListener {
+		    @Override
+		    public void sessionWillPassivate(HttpSessionEvent hse) {
+		      // ... hse.getSession();
+		    }
+		    @Override  
+		    public void sessionDidActivate(HttpSessionEvent hse) {
+			  // ...
+		  	}
+		  }
+		-> HttpSessionAttributeListener
+		  /*The HttpSessionAttributeListener is used to listen for attribute changes in the session:*/
+		  public class MyHttpSessionAttributeListener implements HttpSessionAttributeListener {
+		    @Override
+		    public void attributeAdded(HttpSessionBindingEvent event) {
+		      HttpSession session = event.getSession();
+		      //. . . event.getName();
+		      //. . . event.getValue();
+		    }
+		    @Override
+		    public void attributeRemoved(HttpSessionBindingEvent event) {
+		      //. . .
+		    }
+		    @Override
+		    public void attributeReplaced(HttpSessionBindingEvent event) {
+		      //. . .
+		    }
+		  } 
+		-> HttpSessionBindingListener
+		  /*The HttpSessionBindingListener is used to listen to events when an object is bound to or unbound from a session:*/
+          public class MyHttpSessionBindingListener implements HttpSessionBindingListener {
+            @Override
+            public void valueBound(HttpSessionBindingEvent event) {
+              HttpSession session = event.getSession();
+              //. . . event.getName();
+              //. . . event.getValue();
+            }
+            @Override
+            public void valueUnbound(HttpSessionBindingEvent event) {
+              //. . .
+            }
+          }
+        -> ServletRequestListener
+          /*The ServletRequestListener listens to the events from resources in that request:
+		  @WebListener
+		  public class MyRequestListener implements ServletRequestListener {
+		    @Override
+		    public void requestDestroyed(ServletRequestEvent sre) {
+		      ServletRequest request = sre.getServletRequest();
+              //. . .
+            }
+            @Override
+            public void requestInitialized(ServletRequestEvent sre) {
+              //. . .
+            }
+          }
+        -> ServletRequestAttributeListener
+          The ServletRequestAttributeListener is used to listen for attribute changes in the request.
+          ...
+		-> AsyncListener
+		  There is also AsyncListener, which is used to manage async events such as completed, timed out, or an error.  
+		  ...
+        
+        In addition to declaring listeners using @WebListener and web.xml, or programmatically via ServletContext.addListener 
+        You can do this from the ServletContainerInitializer.onStartup or ServletContextListener.contextInitialized method.
+        -> ServletContainerInitializer
+          /*The ServletContainerInitializer.onStartup method is invoked when the application is starting up for the given 
+          ServletContext:*/
+          public class MyInitializer implements ServletContainerInitializer {
+            public void onStartup(Set<Class<?>> clazz, ServletContext context) {
+              context.addListener("org.example.MyContextListener");
+            }
+          }
+    Asynchronous Support
+     Server resources are valuable and should be used conservatively. 
+     Consider a servlet that has to wait for a JDBC connection to be available from the pool, receiving a JMS message or reading 
+     a resource from the filesystem. Waiting for a “long-running” process to return completely blocks the thread—waiting, 
+     sitting, and doing nothing—which is not an optimal usage of your server resources.
+     This is where the server can be asynchronously processed such that the control (or thread) is returned to the container to 
+     perform other tasks while waiting for the long-running process to complete.
+
+     The asynchronous behavior needs to be explicitly enabled on a servlet. 
+     You achieve this by adding the asyncSupported attribute on @WebServlet:
+        @WebServlet(urlPatterns="/async", asyncSupported=true)
+		public class MyAsyncServlet extends HttpServlet {
+		  //...
+		}
+	  You can also enable the asynchronous behavior by setting the <async-supported> element to true in web.xml or calling 
+	  ServletRegistration.setAsyncSupported (true) during programmatic registration.
+    
+      You can then start the asynchronous processing in a separate thread using the startAsync method on the request. 
+	  This method returns AsyncContext, which represents the execution context of the asynchronous request.
+	  Then you can complete the asynchronous request by calling AsyncContext.complete (explicit) or dispatching to another
+	  resource (implicit). The container completes the invocation of the asynchronous request in the latter case.
+		//LongRunningProcess
+          class MyAsyncService implements Runnable {
+		    AsyncContext ac;
+		    public MyAsyncService(AsyncContext ac) {
+		      this.ac = ac;
+		    }
+		    @Override
+		    public void run() {
+		      //. . .
+		      ac.complete();
+		    }
+		  }
+		//InvokingLongRunningProcess
+		  /*This service may be invoked from the doGet method:*/
+		  @Override
+		  protected void doGet(HttpServletRequest request, HttpServletResponse response) {
+		    
+		    AsyncContext ac = request.startAsync();
+
+		    ac.addListener(new AsyncListener() {
+		      public void onComplete(AsyncEvent event) throws IOException {
+		        //. . .
+		      }
+		      public void onTimeout(AsyncEvent event) throws IOException {
+		        //. . .
+		      }
+		        //. . .
+		    });
+		    ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(10);
+		    executor.execute(new MyAsyncService(ac));
+		  }
+      In this code, the request is put into asynchronous mode. AsyncListener is registered to listen for events when the request 
+      processing is complete, has timed out, or resulted in an error. The long-running service is invoked in a separate thread and calls Async Context.complete, signalling the completion of request processing.
+      A request may be dispatched from an asynchronous servlet to synchronous, but the other way around is illegal.
+    Nonblocking I/O
+      Servlet 3.0 allowed asynchronous request processing but only permitted traditional I/O, which restricted the scalability of 
+      your applications. In a typical application, ServletInputStream is read in a while loop:
+        //loopingServletInputStream
+		  protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+		    ServletInputStream input = request.getInputStream();
+		    byte[] b = new byte[1024];
+		    int len = -1;
+		    while ((len = input.read(b)) != -1) {
+		      //. . .
+		    }
+		  }
+	  Nonblocking I/O allows developers to read data as it becomes available or write data when it’s possible to do so.
+	  Nonblocking I/O only works with async request processing in Servlets, Filters, and Upgrade Processing.
+
+	  Servlet 3.1 achieves nonblocking I/O by introducing two new interfaces: ReadListener and WriteListener.
+	  These listeners have callback methods that are invoked when the content is available to be read or can be written without blocking. The doGet method needs to be rewritten in this case:
+		  AsyncContext context = request.startAsync();
+		  ServletInputStream input = request.getInputStream();
+		  input.setReadListener(new MyReadListener(input, context));
+	  Invoking setXXXListener methods indicates that nonblocking I/O is used instead of traditional.
+
+	  ReadListener has three callback methods:
+	    • onDataAvailable
+	    • onAllDataRead
+	    • onError
+	    //ReadListenerCallBackMethods
+	      @Override
+		  public void onDataAvailable() {
+		    try {
+		      StringBuilder sb = new StringBuilder();
+		      int len = -1;
+		      byte b[] = new byte[1024];
+		      while (input.isReady() && (len = input.read(b)) != -1) {
+		        String data = new String(b, 0, len);
+		      }
+		    } catch (IOException ex) {
+		      //. . .
+		    }
+		  }
+		  @Override
+		  public void onAllDataRead() {
+		    context.complete();
+		  }
+		  @Override
+		  public void onError(Throwable t) {
+		    t.printStackTrace();
+		    context.complete();
+		  }
+	  WriteListener has two callback methods:
+	    • onWritePossible
+	    • onError
+	Web Fragments
+	  A web fragment is part or all of the web.xml file included in a library or framework JAR’s META-INF directory
+	  If this framework is bundled in the WEB-INF/lib directory, the container will pick up and configure the framework without 
+	  requiring the developer to do it explicitly. It can include almost all of the elements that can be specified in web.xml.
+	    //web-fragment.xml
+	      <web-fragment>
+		    <filter>
+		      <filter-name>MyFilter</filter-name>
+		      <filter-class>org.example.MyFilter</filter-class>
+		      <init-param>
+		      <param-name>myInitParam</param-name>
+		      <param-value>...</param-value>
+		      </init-param>
+		    </filter>
+		    <filter-mapping>
+		      <filter-name>MyFilter</filter-name>
+		      <url-pattern>/*</url-pattern>
+		    </filter-mapping>
+		  </web-fragment>
+
+	  The developer can specify the order in which the resources specified in web.xml and web-fragment.xml need to be loaded.
+	    //<absolute-order> -> web.xml
+	      <web-app>
+			<name>MyApp</name>
+			<absolute-ordering>
+			  <name>MyServlet</name>
+			  <name>MyFilter</name>
+			</absolute-ordering>
+		  </web-app>
+		//<before>|<after> -> web-fragment.xml
+		  <web-fragment>
+		    <name>MyFilter</name>
+		    <ordering>
+		      <after>MyServlet</after>
+		    </ordering>
+		  </web-fragment>
+	  If web.xml has metadata-complete set to true, then the web-fragment.xml file is not processed. 
+	  The web.xml file has the highest precedence when resolving conflicts between web.xml and web-fragment.xml.
+	  If a web-fragment.xml file does not have an <ordering> element and web.xml does not have an <absolute-ordering> element, 
+	  the resources are assumed to not have any ordering dependency.
+	Security
+	  You can specify the servlet security model, including roles, access control, and authentication requirements, using 
+	  annotations or in web.xml. @ServletSecurity is used to specify security constraints on the servlet implementation class for 
+	  all methods or a specific doXXX method. The container will enforce that the corresponding doXXX messages can be invoked by 
+	  users in the specified roles
+	    • Annotations
+	      Those annotations provide an alternative set of annotations to specify security roles on a particular resource or a 
+	      method of the resource. If an annotation is specified on both the class and the method level, the one specified
+		  on the method overrides the one specified on the class.
+		    //@ServletSecurity
+		      @WebServlet("/account")
+			  @ServletSecurity( value=@HttpConstraint(rolesAllowed = {"R1"})
+			  				   ,httpMethodConstraints={@HttpMethodConstraint(value="GET",rolesAllowed="R2")
+			  					                      ,@HttpMethodConstraint(value="POST",rolesAllowed={"R3", "R4"})})
+			  public class AccountServlet extends javax.servlet.http.HttpServlet {
+			    //. . .
+			  }
+		    @RolesAllowed
+		      @RolesAllowed("R2")
+			  protected void doGet(HttpServletRequest request, HttpServletResponse response) {
+			    //. . .
+			  }
+		    @DenyAll
+		    @PermitAll
+		    @TransportProtected 
+		• Deployment Descriptor (web.xml)
+			//[GET method at the /account/* URL]
+			  <security-constraint>
+				<web-resource-collection>
+				  <url-pattern>/account/*</url-pattern>
+				  <http-method>GET</http-method>
+				</web-resource-collection>
+				<auth-constraint>
+				  <role-name>manager</role-name>
+				</auth-constraint>
+				<user-data-constraint>
+				  <transport-guarantee>INTEGRITY</transport-guarantee>
+				</user-data-constraint>
+			  </security-constraint>
+			//[apply to the complete set of HTTP (extension) methods]
+			  <security-constraint>
+				<web-resource-collection>
+				  <url-pattern>/account/*</url-pattern>
+				</web-resource-collection>
+				. . .
+			  </security-constraint>
+			//[<http-method-omission>]
+			  The <http-method-omission> element can be used to specify the list of HTTP methods not protected by the constraint
+			  -> In this code, only the HTTP GET method is not protected and all other HTTP protocol methods are protected.
+			  <security-constraint>
+				<web-resource-collection>
+				  <url-pattern>/account/*</url-pattern>
+				  <http-method-omission>GET</http-method-omission>
+				</web-resource-collection>
+				. . .
+			  </security-constraint>
+			//[<deny-uncovered-http-methods>]
+			  The <deny-uncovered-http-methods> element, a new element in Servlet 3.1, can be used to deny an HTTP method request 
+			  for an uncovered HTTP method. The denied request is returned with a 403 (SC_FORBIDDEN) status code.
+			  -> In this only the HTTP GET method is protected and all other HTTP protocol methods are denied with a 403 code.
+			  <web-app xmlns="..." xmlns:xsi="" xsi:schemaLocation="" version="3.1">
+				<deny-uncovered-http-methods/>
+				<web-resource-collection>
+				<url-pattern>/account/*</url-pattern>
+				<http-method>GET</http-method>
+				</web-resource-collection>
+				. . .
+			  </web-app>
+      
+      Servlet 3.1 introduces two new predefined roles:
+        • * maps to any defined role.
+		• ** maps to any authenticated user independent of the role
+		-> This allows you to specify security constraints at a higher level than a particular role.
+      The servlets can be configured for HTTP Basic, HTTP Digest, HTTPS Client, and formbased authentication:
+		<form method="POST" action="j_security_check">
+		  <input type="text" name="j_username">
+		  <input type="password" name="j_password" autocomplete="off">
+		  <input type="button" value="submit">
+		</form>      
+    Resource Packaging
+      You can access resources bundled in the .war file using the ServletContext.getResource and .getResourceAsStream methods.
+      The resource path is specified as a string with a leading “/.” This path is resolved relative to the root of the context 
+      or relative to the META-INF/resources directory of the JAR files bundled in the WEB-INF/lib directory
+    Error Mapping
+      An HTTP error code or an exception thrown by a serlvet can be mapped to a resource bundled with the application 
+      to customize the appearance of content when a servlet generates an error.
+      The <error-page> declaration must be unique for each class name and HTTP status code.
+        //web.xml
+         ...
+		  <error-page>
+		    <error-code>404</error-code>
+		    <location>/error-404.jsp</location>
+		  </error-page>
+		  <error-page>
+		    <exception-type>org.example.MyException</exception-type>
+		    <location>/error.jsp</location>
+	      </error-page>
+	     ...
+    Handling Multipart Requests
+      @MultipartConfig may be specified on a servlet, indicating that it expects a request of type multipart/form-data. 
+      The HttpServletRequest.getParts and .getPart methods then make the various parts of the multipart request available:
+        //MultipartConfig
+          @WebServlet(urlPatterns = {"/FileUploadServlet"})
+		  @MultipartConfig(location="/tmp")
+		  public class FileUploadServlet extends HttpServlet {
+		    @Override
+		    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		      for (Part part : request.getParts()) {
+		        part.write("myFile");
+		      }
+		    }
+		  }
+		//form.jsp
+		  <form action="FileUploadServlet"
+			    enctype="multipart/form-data"
+			    method="POST">
+		    <input type="file" name="myFile"><br>
+		    <input type="Submit" value="Upload File"><br>
+		  </form>
+    Upgrade Processing
+      

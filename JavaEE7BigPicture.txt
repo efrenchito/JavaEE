@@ -1,0 +1,41 @@
+1.The Big Picture
+  Browser
+Java Client
+
+Java EE
+[Web Container] -> Servlets|JSPs|Tag Libs|Java ServerFaces|WebServices|WebSockets
+[EJB Container] -> EJBs
+Security|Dependency Injection|Transactions|JMS|Persistence|JavaMail|Connector|JDBC
+
+Database
+
+
+Browser Client -> render the HTML content & send the message typed in by the user 2 the texf field.
+Web Components -> DisplayServlet/WriteServlet 
+                  => creates the HTML content for the browser
+                  => To direct the incoming user message to the correct portion of the application that
+                     can handle
+
+Part I. THE MOUTHPIECE OF JAVA EE: THE WEB TIER
+2 Java Servlets and Web Applications: Foundations of the Web Tier
+3 Dynamic Web Pages: JSP
+4 Assembling Dynamic Web Pages: JavaServer Faces
+5 Web Sites for Non-browsers: JAX-RS
+6 Adding Sparkle: Java WebSockets
+7 Securing Web Applications
+8 The Self-Contained Web Site: Java EE Web Application
+
+PART II. THE BRAIN OF JAVA EE: THE MIDDLE TIER
+9 The Fundamentals of Enterprise Beans
+10 Advanced Thinking with Enterprise Beans
+
+
+PART III. THE COLLECTIVE MEMORY: THE INFORMATION TIER
+11 Classic Memories: JDBC
+12 Modern Memories: The Java Persistence API
+
+PART IV. THE JAVA EE TOOLBOX: JAVA EE ENVIRONMENT
+13 The Big Picture Revisited: Java EE Applications
+14 Deconstructing Components: Java EE Contexts and Dependency Injection
+15 Java EE Security
+16 Many Hands Make Light Work: Java EE Concurrency

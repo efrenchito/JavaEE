@@ -1,0 +1,1741 @@
+netstat -aon | find ":4848" | find "LISTENING" -> Then call the process with that PID
+
+JavaEE samples -> https://github.com/javaee-samples/javaee7-samples
+Git Installation -> https://www.youtube.com/watch?v=J_Clau1bYco
+A Little REST with JAX-RS 2.0 and Java EE 7 -> https://www.youtube.com/watch?v=1wEp9yHHtwg 
+JavaEE 7 Tutorial -> https://docs.oracle.com/javaee/7/tutorial/index.html
+  	              -> https://docs.oracle.com/javaee/7/firstcup/preface.htm#GCQYU
+  	              ...
+	Related Documentation
+	  Nebeans JSF Intro -> https://netbeans.org/kb/docs/web/jsf20-intro.html
+	  https://glassfish.java.net/docs/
+	  http://docs.oracle.com/javaee/7/api/
+	  http://www.oracle.com/technetwork/java/javaee/tech/index.html
+	  https://netbeans.org/kb/
+	  http://www.oracle.com/technetwork/java/javadb/overview/index.html.
+	  https://blogs.oracle.com/theaquarium/
+	  JavaEE 6 Tutorial -> https://docs.oracle.com/cd/E19798-01/821-1841/index.htm	  
+	  JavaEE 5 Tutorial -> http://docs.oracle.com/javaee/5/tutorial/doc/bnaaw.html
+	                    -> http://www.oracle.com/technetwork/java/javaee/documentation/index-137726.html
+	                    ...
+
+PART I. Introduction
+    Chapter 1, "Overview"
+     This chapter introduces you to Java EE enterprise application development. Here you will review development basics, learn 
+     about the Java EE architecture and APIs, become acquainted with important terms and concepts, and find out how to approach 
+     Java EE application programming, assembly, and deployment.
+     The Java EE platform is developed through the Java Community Process (JCP), which is responsible for all Java technologies. 
+     Expert groups composed of interested parties have created Java Specification Requests (JSRs) to define the various Java EE 
+     technologies. The work of the Java Community under the JCP program helps to ensure Java technology's standards of stability 
+     and cross-platform compatibility.
+     The following topics are addressed here:
+	    +Java EE 7 Platform Highlights
+		  The Java EE 7 platform includes the following new features:
+		  .New technologies, including the following:
+		    -Batch Applications for the Java Platform
+		    -Concurrency Utilities for Java EE
+		    -Java API for JSON Processing (JSON-P)
+		    -Java API for WebSocket
+		  .New features for EJB components
+		  .New features for servlets (see Java Servlet Technology for details)
+		  .New features for JavaServer Faces components (see JavaServer Faces Technology for details)
+		  .New features for the Java Message Service (JMS) (see Java Message Service API for details)
+	    +Java EE Application Model
+	     The Java EE application model begins with the Java programming language and the Java virtual machine. The proven 
+	     portability, security, and developer productivity they provide form the basis of the application model.
+	     The Java EE application model defines an architecture for implementing services as multitier applications that deliver 
+	     the scalability, accessibility, and manageability needed by enterprise-level applications. This model partitions the 
+	     work needed to implement a multitier service into the following parts:
+	      - The business and presentation logic to be implemented by the developer
+		  - The standard system services provided by the Java EE platform
+	    +Distributed Multitiered Applications
+	     The Java EE platform uses a distributed multitiered application model for enterprise applications. Application logic is 
+	     divided into components according to function, and the application components that make up a Java EE application are 
+	     installed on various machines depending on the tier in the multitiered Java EE environment to which the application 
+	     component belongs.
+	       .Client-tier components run on the client machine.
+		   .Web-tier components run on the Java EE server.
+		   .Business-tier components run on the Java EE server.
+		   .Enterprise information system (EIS)-tier software runs on the EIS server.
+		 Java EE multitiered applications are generally considered to be three-tiered applications because they are distributed 
+		 over three locations: client machines, the Java EE server machine, and the database or legacy machines at the back end. 
+		 Three-tiered applications that run in this way extend the standard two-tiered client-and-server model by placing a 
+		 multithreaded application server between the client application and back-end storage.
+	    +Java EE Containers
+	     The component-based and platform-independent Java EE architecture makes applications easy to write because business 
+	     logic is organized into reusable components. In addition, the Java EE server provides underlying services in the form 
+	     of a container for every component type.
+	      -> Container Services
+           Containers are the interface between a component and the low-level, platform-specific functionality that supports the 
+           component. The assembly process involves specifying container settings for each component in the Java EE application 
+           and for the Java EE application itself. Container settings customize the underlying support provided by the Java EE 
+           server.
+            - The Java EE security model
+            - The Java EE transaction model
+            - JNDI lookup services
+            - The Java EE remote connectivity model
+          -> Container Types
+		   The deployment process installs Java EE application components in the Java EE containers
+           The server and containers are as follows:
+		    - Java EE server: The runtime portion of a Java EE product. A Java EE server provides EJB and web containers.
+		    - EJB container: Manages the execution of enterprise beans for Java EE applications. [Java EE server]
+		    - Web container: Manages the execution of web pages, servlets, and some EJB components for Java EE applications. 
+		        [Java EE server]
+	 	    - Application client container: Manages the execution of application client components. [Client]
+	        - Applet container: Manages the execution of applets. Consists of a web browser and a Java Plug-in [Client]
+	    +Web Services Support
+	     Web services are web-based enterprise applications that use open, XML-based standards and transport protocols to exchange data with calling clients. The Java EE platform provides the XML APIs and tools you need to quickly design, develop, test, and deploy web services and clients that fully interoperate with other web services and clients running on Java-based or non-Java-based platforms.
+	      XML
+		   Extensible Markup Language (XML) is a cross-platform, extensible, text-based standard for representing data. Parties 
+		   that exchange XML data can create their own tags to describe the data, set up schemas to specify which tags can be 
+		   used in a particular kind of XML document, and use XML style sheets to manage the display and handling of the data.
+		  SOAP Transport Protocol
+		   Client requests and web service responses are transmitted as Simple Object Access Protocol (SOAP) messages over HTTP 
+		   to enable a completely interoperable exchange between clients and web services, all running on different platforms 
+		   and at various locations on the Internet. HTTP is a familiar request-and-response standard for sending messages over 
+		   the Internet, and SOAP is an XML-based protocol that follows the HTTP request-and-response model. 
+		  WSDL Standard Format
+		   The Web Services Description Language (WSDL) is a standardized XML format for describing network services. The 
+		   description includes the name of the service, the location of the service, and ways to communicate with the service. 
+		   WSDL service descriptions can be published on the Web. 
+	    +Java EE Application Assembly and Deployment
+	     A Java EE application is packaged into one or more standard units for deployment to any Java EE platform-compliant 
+	     system. Each unit contains
+		  - A functional component or components, such as an enterprise bean, web page, servlet, or applet
+		  - An optional deployment descriptor that describes its content
+		    +Java EE 7 APIs
+	    +Java EE 7 APIs in the Java Platform, Standard Edition 7
+	    +GlassFish Server Tools
+    Chapter 2, "Using the Tutorial Examples"
+	    -> 2.1-Required Software
+	     The following software is required to run the examples:
+	      . Tutorial Bundle
+		   To Obtain the Tutorial Bundle
+		   1. Open the following URL in a web browser: 
+		   https://javaee.github.io/ | http://javaeetutorial.java.net/ | https://java.net/projects/javaeetutorial/downloads/
+		   2. Click the Downloads link in the left sidebar.
+		   3. In the table on the Downloads page, locate the latest stable version of the Java EE 5 Tutorial zip file.
+		   4. Right-click the zip file name and save it to your system.
+		   5. Unzip the zip file to a location of your choice.
+		      The tutorial bundle unzips into the directory javaeetutorial5. 
+	      -Java Platform, Standard Edition
+		  -Java EE 7 Software Development Kit
+		  -Java EE 7 Tutorial Component
+		  -NetBeans IDE
+		  -Apache Maven
+		  Ant is a Java technology-based build tool developed by the Apache Software Foundation (http://ant.apache.org/), and is   used to build, package, and deploy the tutorial examples. 
+		  Ant is included with the Application Server. To use the ant command, add as-install/lib/ant/bin to your PATH   environment variable.  		  
+	    -> 2.2-Starting and Stopping the Application Server (GlassFish)
+	        .Via terminal Window:
+	          To start the Application Server, open a terminal window or command prompt and execute the following:
+			    Microsoft Windows [Versión 6.1.7601]
+			    Copyright (c) 2009 Microsoft Corporation. Reservados todos los derechos.
+      
+			    C:\>cd C:\Program Files\glassfish-4.1.1\bin
+			    .:\>asadmin start-domain --verbose domain1
+      		
+		        A domain is a set of one or more Application Server instances managed by one administration server. 
+		        Associated with a domain are the following:
+			    . The Application Server’s port number. The default is 8080.
+   		        . The administration server’s port number. The default is 4848.
+			    . An administration user name and password.
+  
+		        -> You specify these values when you install the Application Server. 
+			    The examples in this tutorial assume that you chose the default ports. (admin/admin)
+		      To stop the Application Server, open a terminal window or command prompt and execute:
+				      Microsoft Windows [Versión 6.1.7601]
+				      Copyright (c) 2009 Microsoft Corporation. Reservados todos los derechos.
+    	  
+				      C:\>cd glassfish4.1.1\bin
+				      C:\glassfish4.1.1\bin>asadmin stop-domain domain1
+		    .Via NetBeans
+		     Windows>Services>Servers
+		      -> left Click on GlassFish / Start
+		      -> left Click on GlassFish / Stop
+	    -> 2.3-Starting the Admin Console (GlassFish)
+	        After you start (Glassfish) Application Server ...
+	        To start the Admin Console
+	          Open a browser at http://localhost:4848/
+	          ...
+	        To Start the Administration Console Using NetBeans IDE
+	          1.Click the Services tab.
+			  2.Expand Servers.
+			  3.Right-click the GlassFish Server instance and select View Domain Admin Console.
+	    -> 2.4-Starting and Stopping the Java DB Database Server
+	       http://www.oracle.com/technetwork/java/javadb/overview/index.html
+            To Start|Stop the Database Server from the command line
+	          Microsoft Windows [Versión 6.1.7601]
+			  Copyright (c) 2009 Microsoft Corporation. Reservados todos los derechos.
+
+			  C:\>cd C:\Program Files\glassfish-4.1.1\bin
+			  .:\>asadmin start-database
+			  ...
+			  C:\cd C:\Program Files\glassfish-4.1.1\bin
+			  .:\>asadmin stop-database
+			To Start|Stop the Database Server Using NetBeans IDE
+			  1.Click the Services tab.
+			  2.Expand Databases.
+			  3.Right-click Java DB and select Start|Stop Server.
+        -> 2.5-Building the Examples
+		  The tutorial examples are distributed with a configuration file for either NetBeans IDE or Maven. Either NetBeans IDE 
+		  or Maven may be used to build, package, deploy, and run the examples. Directions for building the examples are 
+		  provided in each chapter.
+	    -> 2.6-Tutorial Example Directory Structure
+	      Directory Structure
+	       To facilitate iterative development and keep application source files separate from compiled files, the tutorial 
+	       examples use the Maven application directory structure.
+
+	       Each application module has the following structure:
+			pom.xml: Maven build file
+			src/main/java: Java source files for the module
+			src/main/resources: configuration files for the module, with the exception of web applications
+			src/main/webapp: web pages, style sheets, tag files, and images (web applications only)
+			src/main/webapp/WEB-INF: configuration files for web applications (web applications only)
+
+		  When an example has multiple application modules packaged into an EAR file, its submodule directories use the 
+		  following naming conventions:
+			example-name-app-client: application clients
+			example-name-ejb: enterprise bean JAR files
+			example-name-war: web applications
+			example-name-ear: enterprise applications
+			example-name-common: library JAR containing components, classes, and files used by other modules
+	    -> 2.7-Java EE 7 Maven Archetypes in the Tutorial
+	      Some of the chapters have instructions on how to build an example application using Maven archetypes. Archetypes are 
+	      templates for generating a particular Maven project. The Tutorial includes several Maven archetypes for generating 
+	      Java EE 7 projects.
+	        -> Installing the Tutorial Archetypes Using NetBeans IDE
+				1.From the File menu, choose Open Project.
+				2.In the Open Project dialog box, navigate to:
+				  tut-install/examples
+				3.Select the archetypes folder.
+				4.Click Open Project.
+				5.In the Projects tab, right-click the archetypes project and select Build.
+	        -> Installing the Tutorial Archetypes Using Maven
+			  In a terminal window, go to:
+			    tut-install/examples/archetypes/
+			  Enter the following command:
+			    mvn install
+	    -> 2.8-Getting the Latest Updates to the Tutorial
+	      Check for any updates to this tutorial by using the Update Center included with the Java EE 7 SDK+Glassfish.
+	        :Git <Clone repository>
+	            CHECK INSTALLATIONS
+	             C:\> git
+	             C:\> java -version
+	             C:\> mvn -version
+	            Windows -> Create directory C:\Oracle\Java\javaee7-samples
+	            GIT CLONE
+	             $ git clone https://github.com/javaee-samples/javaee7-samples.git
+	             ...
+	            Windows 
+	             C:\> cd C:\Oracle\Java\javaee7-samples
+	             .:\> dir
+	             <!-- cleanly build and deploy artifacts into the shared repository -->
+	             .:\> mvn clean install -Dmaven.test.skip=true
+	             .:\> cd jpa\native-sql-resultset-mapping
+	             .:\> mvn clean install -Pwildfly-embedded-arquillian
+
+		    :Through Update Center Tool
+			    .Via NetBeans
+			        1.Open the Services tab and expand the Servers node.
+			        2.Right-click the GlassFish Server instance and select View Domain Update Center to display the Update Tool.
+			     	  In the tree, select Available Updates to display a list of updated packages.
+			     	  Look for updates to the First Cup for Java EE 7 (javaee-firstcup-tutorial) package.
+		            -> If there is an updated version, select First Cup for Java EE 7 (javaee-firstcup-tutorial) and click Install.
+
+		        To start the Application Server, open a terminal window or command prompt and execute the following:
+				    Microsoft Windows [Versión 6.1.7601]
+				    Copyright (c) 2009 Microsoft Corporation. Reservados todos los derechos.
+	      
+				    C:\>cd C:\Program Files\glassfish-4.1.1\bin
+				    .:\>updatetool
+				        ...
+				        Would you like to install Update Tool now <y/n>: y
+        -> 2.9 Debugging Java EE Applications
+
+PART II. Platform Basics
+	Chapter 3, "Resource Creation"
+	  A resource is a program object that provides connections to such systems as database servers and messaging systems. Java EE components can access a wide variety of resources, including databases, mail sessions, Java Message Service objects, and URLs. The Java EE 7 platform provides mechanisms that allow you to access all these resources in a similar manner. This chapter examines several types of resources and explains how to create them.
+	  The following topics are addressed here:
+		
+		3.1 Resources and JNDI Naming
+		 In the Java EE platform, the Java Naming and Directory Interface (JNDI) naming service enables components to locate 
+		 other components and resources. Each resource object is identified by a unique, people-friendly name, called the JNDI 
+		 name. For example, the JNDI name of the preconfigured JDBC resource for the Java DB database that is shipped with 
+		 GlassFish Server is java:comp/DefaultDataSource.
+		 
+		 A resource object and its JNDI name are bound together by the naming and directory service. To create a new resource, a 
+		 new name/object binding is entered into the JNDI namespace. You inject resources by using the @Resource annotation in 
+		 an application.
+		3.2 DataSource Objects and Connection Pools
+		 To store, organize, and retrieve data, most applications use a relational database. Java EE 7 components may access relational databases through the JDBC API.
+		 In the JDBC API, databases are accessed by using DataSource objects. A DataSource has a set of properties that identify 
+		 and describe the real-world data source that it represents. (location, DB-name, network protocol, ...)
+		 Applications access a data source by using a connection, and a DataSource object can be thought of as a factory for 
+		 connections to the particular data source that the DataSource instance represents.
+
+		 A DataSource object may be registered with a JNDI naming service. If so, an application can use the JNDI API to access that DataSource object, which can then be used to connect to the data source it represents.
+
+		 Applications that use the Persistence API specify the DataSource object they are using in the jta-data-source element of the persistence.xml file:
+
+		   <jta-data-source>jdbc/MyOrderDB</jta-data-source>
+
+		 This is typically the only reference to a JDBC object for a persistence unit. The application code does not refer to 
+		 any  JDBC objects. You can use a deployment descriptor to override the resource mapping that you specify in an annotation.
+        3.3 Creating Resources Administratively
+         Before you deploy or run many applications, you may need to create resources for them. An application can include a glassfish-resources.xml file that can be used to define resources for that application and others.
+
+         Some of the JMS examples use this approach to resource creation. A file for creating the resources needed for the JMS simple producer example can be found in the jms/simple/producer/src/main/setup directory.
+          asadmin create-jms-resource -> Create resources
+          asadmin list-jms-resources  -> Display their names
+          asadmin delete-jms-resource -> Remove those resources	
+	Chapter 4, "Injection"
+	  Java EE provides injection mechanisms that enable your objects to obtain references to resources and other dependencies 
+	  without having to instantiate them directly. You declare the required resources and other dependencies in your classes by 
+	  decorating fields or methods with one of the annotations that mark the field as an injection point. The container then 
+	  provides the required instances at runtime. Injection simplifies your code and decouples it from the implementations of 
+	  its dependencies.
+
+	  The following topics are addressed here:
+
+		4.1 Resource Injection
+		  Resource injection enables you to inject any resource available in the JNDI namespace into any container-managed 
+		  object, such as a servlet, an enterprise bean, or a managed bean. 
+		    //field-based injection
+		      public class MyServlet extends HttpServlet {
+			      @Resource(name="java:comp/DefaultDataSource")
+			      private javax.sql.DataSource dsc;
+			      ...
+			  }
+			//method-based injection
+			  public class MyServlet extends HttpServlet {
+			      private javax.sql.DataSource dsc;
+			      ...
+			      @Resource(name="java:comp/DefaultDataSource")
+			      public void setDsc(java.sql.DataSource ds) {
+			          dsc = ds;
+			      }
+			  }
+		
+		  To use method-based injection, the setter method must follow the JavaBeans conventions for property names: The method name must begin with set, have a void return type, and have only one parameter.
+		  The @Resource annotation is in the javax.annotation package and is defined in JSR 250 (Common Annotations for the Java 
+		  Platform). Resource injection resolves by name, so it is not typesafe: the type of the resource object is not known at 
+		  compile time, so you can get runtime errors if the types of the object and its reference do not match  
+		4.2 Dependency Injection
+		  Dependency injection enables you to turn regular Java classes into managed objects and to inject them into any other managed object. The container automatically provides instances of these dependencies at the injection points at runtime, and it also manages the lifecycle of these instances for you.
+		  Dependency injection in Java EE defines scopes, which determine the lifecycle of the objects that the container 
+		  instantiates and injects. You can define managed objects (also called managed beans) that you can later inject by 
+		  assigning a scope to a regular class:
+
+			@javax.enterprise.context.RequestScoped
+			public class CurrencyConverter { ... }
+			
+		  Use the javax.inject.Inject annotation to inject managed beans; for example:
+			public class MyServlet extends HttpServlet {
+			    @Inject CurrencyConverter cc;
+			    ...
+			}
+		  As opposed to resource injection, dependency injection is typesafe because it resolves by type.
+		4.3 The Main Differences between Resource Injection and Dependency Injection
+		  Injection Mechanism	Can Inject JNDI Resources Directly	Can Inject Regular Classes Directly	Resolves By	  Typesafe
+	      Resource Injection                 Yes                          No                            Resource name   No
+	      Dependency Injection               No                          Yes                            Type            Yes
+	Chapter 5, "Packaging"
+	  This chapter describes packaging. A Java EE application is packaged into one or more standard units for deployment to any 
+	  Java EE platform–compliant system. Each unit contains a functional component or components, such as an enterprise bean, 
+	  web page, servlet, or applet, and an optional deployment descriptor that describes its content.
+
+	  The following topics are addressed here:
+	    5.1 Packaging Applications
+	      A Java EE application is delivered 
+	        in a Java Archive (JAR) file, a Web Archive (WAR) file, or an Enterprise Archive (EAR) file.
+	      An EAR file contains Java EE modules and, optionally, deployment descriptors. A deployment descriptor, an XML 
+	      document with an .xml extension, describes the deployment settings of an application, a module, or a component. 
+	      Deployment information is most commonly specified in the source code by annotations. Deployment descriptors, if 
+	      present, override what is specified in the source code.
+	      A Java EE module consists of one or more Java EE components for the same container type and, optionally, one component 
+	      deployment descriptor of that type. 
+	        .EJB modules (.jar)
+	        .Web modules (.war)
+	        .Application client modules (.jar)
+	        .Resource adapter modules (.rar)
+		5.2 Packaging Enterprise Beans
+		5.3 Packaging Web Archives
+		5.4 Packaging Resource Adapter Archives
+
+PART III. The Web Tier
+	Chapter 6, "Getting Started with Web Applications"
+	  A web application is a dynamic extension of a web or application server. Web applications are of the following types:
+	   .Presentation-oriented:
+	   .Service-oriented:
+
+	  The following topics are addressed here:
+	    + Web Applications
+	      Web components can be Java servlets, web pages implemented with JavaServer Faces technology, web service endpoints,
+	      or JSP pages. Servlets are best suited for service-oriented applications, JavaServer Faces and Facelets pages are 
+	      generally used for presentation-oriented applications.
+	      Web components are supported by the services of a runtime platform called a web container. 
+	      A web container provides such services as request dispatching, security, concurrency, and lifecycle management.
+
+	      Certain aspects of web application behavior can be configured when the application is installed, or deployed, to the web container. The configuration information can be specified using Java EE annotations or can be maintained in a text file in XML format called a web application deployment descriptor (DD)
+		+ Web Application Lifecycle
+		  The process for creating, deploying, and executing a web application can be summarized as follows:
+			Develop the web component code.
+			Develop the web application deployment descriptor, if necessary.
+			Compile the web application components and helper classes referenced by the components.
+			Optionally, package the application into a deployable unit.
+			Deploy the application into a web container.
+			Access a URL that references the web application.
+		+ A Web Module That Uses JavaServer Faces Technology: The hello1 Example
+	        [JSP]
+	            JSP Scripting Elements
+				    JSP Expressions <%=  %>
+				     Compute an Expressions Result is included in HTML returned to the Browser
+				        //helloworld.jsp
+				         <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+				         <html>
+				            <head>
+				              <title>Mi First JSP Application</title>
+				            </head>
+				           <body>
+				             The time on the server is <%= new java.util.Date() %>
+				             Generated HTML -> The time on the server is Mon Mar 12 11:18:45 EST 2018
+				             <%= new String("Hello, World!!!").toUpperCase() %>
+				             <% 25*4 %>
+				             <% 75 < 69 %>
+				           </body>
+				         </html>
+				    JSP Scriptlet   <% ...Some Java Lines of code %>
+				      .Insert 1 to many lines of Java code
+				      .To include content in the page use: out.println(...)
+				        //scriptlet-test.jsp
+				         <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+				         <html>
+				            <head>
+				              <title>Mi First JSP Application</title>
+				            </head>
+				           <body>
+				             <h3>Hello World of Java</h3>
+						     <%
+						        for(int k = 1; k <= 5; k++) {
+						          out.println("<br/>I really luv2code: " + i );
+						        }
+						     %>
+				           </body>
+				         </html>
+					JSP Declaration <%! %>
+					  .Declare a method in the JSP page
+					  .Call the method in the same JSP page
+						//declaration-test.jsp
+				         <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+				         <html>
+				            <head>
+				              <title>Mi First JSP Application</title>
+				            </head>
+				           <body>
+				             <%! String makesItLower(Strin data) {
+				                   return data.toLowerCase();
+				                 }
+				             %>
+				             <h3>Hello World of Java</h3>
+						     Lower case "Hello World":<%= makeItLower("Hello World") %>
+				           </body>
+				         </html>
+				    Best Practices
+					 -> Minimize the amount of scriptlets and declarations code in a JSP
+					 -> Avoid dumping thousands of lines of code in JSP
+					 -> Refactor this into a separate Java class ... make use of MVC
+			    Call Java Classes from JSP
+			        //FunUtils.java
+			          package com.luv2code.jsp;
+
+			          public class FunUtils{
+			            public static String makeItLower(String data){
+			              return data.toLowerCase();
+			            }
+			          } 
+			        //importclasses-test.jsp
+			         <%@ page import="com.luv2code.jsp.FunUtils" %>
+			         <%-- <%@ page import="com.luv2code.jsp.*, java.util.ArrayList" %> -->
+			         <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+			         <html>
+			           <head>
+			             <title>My first JSP application</title>
+			           </head>
+			           <body>
+			             <%-- Let's import some Java Class: <%= com.luv2code.jsp.FunUtils.makeItLower("FUN FUN FUN...")%> -->
+			             Let's import some Java Class: <%= FunUtils.makeItLower("FUN FUN FUN...")%>
+			           </body>
+			         </html>
+			    Built-In Server Objects
+			      .Given to you for free
+			      .Use them directly in your JSP page
+			      .List of commonly used JSP objects
+                    Object       Description
+                    request      Contains HTTP request headers and form data
+                    response     Provides HTTP support for sending response
+                    out          JSPWriter for including content in HTML page
+                    session      Unique session for each user of the web application
+                    application  Shared data for all users of the web application
+                    //builtin-test.jsp
+                     <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+                     <html>
+                       <head>
+                         <title>My first JSP Application</title>
+                       </head>
+                       <body>
+                         <h3>JSP Built-In Objects</h3>
+                         Request user agent: <%= request.getHeader("User-Agent") %>
+                         <br/><br/>
+                         Request language: <%= request.getLocale() %>
+                       </body>
+                     </html>
+                Including Files with JSP
+                    //my-header.html
+                      <h1 align="center">JSP Tutorial</h1>
+                      ....
+                    //my-footer.jsp
+                      <p align="center">
+                       Last updated: <%= new java.util.Date() %>
+                      </p>
+                    //homepage.jsp
+                      <!DOCTYPE HTML PUBLIC "-//W3C-//DTD HTML 4.0 Transitional//EN">
+                      <html>
+                        <head>
+                          <title>My first HTML Form</title>
+                        </head>
+                        <body>
+                          <jsp:include page="my-header.html" />
+                          Blah blah blah ... <br/><br/>
+                          Blah blah blah ... <br/><br/>
+                          Blah blah blah ... <br/><br/>
+                          Blah blah blah ... <br/><br/>
+                          <jsp:include page="my-footer.jsp" />
+                        </body>
+                      </html>
+                HTML Forms Overview
+                        //student-form.html
+                          <!DOCTYPE HTML PUBLIC "-//W3C-//DTD HTML 4.0 Transitional//EN">
+                          <html>
+                            <head>
+                              <title>My first HTML Form</title>
+                            </head>
+                            <body>
+	                          <form action="student-response.jsp">
+	                            First name: <input type="text" name="firstName" />
+	                            Last name: <input type="text" name="lastName" />
+	                            <input type="submit" value="Submit" />
+	                          </form>
+	                        </body>
+	                      </html>    
+                        //student-response.jsp
+                          <!DOCTYPE HTML PUBLIC "-//W3C-//DTD HTML 4.0 Transitional//EN">
+                          <html>
+                            <head>
+                              <title>Student Res Page</title>
+                            </head>
+                            <body>
+                              <%-- Short cut method only used for displaying form data-->
+                              The student is confirmed: ${param.firstName} ${param.lastName}
+                              <%-- <%= request.getParameter("firstName") %> -->
+                              <%-- <%= request.getParameter("lastName") %> -->
+                            </body>
+                          </html>    
+                    -> DropDownList
+                        //student-dropdown-form.html
+                          <!DOCTYPE HTML PUBLIC "-//W3C-//DTD HTML 4.0 Transitional//EN">
+                          <html>
+                            <head>
+                              <title>My first HTML Form</title>
+                            </head>
+                            <body>
+	                          <form action="student-dropdown-response.jsp">
+	                            First name: <input type="text" name="firstName" />
+	                            Last name: <input type="text" name="lastName" />
+	                            <select name="country">
+	                              <option>Brazil</option>
+	                              <option>France</option>
+	                              <option>Germany</option>
+	                              <option>India</option>
+	                              <option>Turkey</option>
+	                              <option>United Kingdom</option>
+	                              <option>United States of America</option>
+	                            </select>
+	                            <input type="submit" value="Submit" />
+	                          </form>
+	                        </body>
+	                      </html>    
+                        //student-dropdown-response.jsp
+                          <!DOCTYPE HTML PUBLIC "-//W3C-//DTD HTML 4.0 Transitional//EN">
+                          <html>
+                            <head>
+                              <title>Student Res Page</title>
+                            </head>
+                            <body>
+                              <%-- Short cut method only used for displaying form data-->
+                              The student is confirmed: ${param.firstName} ${param.lastName}
+                              <br/><br/>
+                              The student's country: ${param.country}
+                              <%-- <%= request.getParameter("firstName") %> -->
+                              <%-- <%= request.getParameter("lastName") %> -->
+                              <%-- <%= request.getParameter("country") %> -->
+                            </body>
+                          </html>    
+    			    -> RadioButton
+    			        //student-radio-form.html
+                          <!DOCTYPE HTML PUBLIC "-//W3C-//DTD HTML 4.0 Transitional//EN">
+                          <html>
+                            <head>
+                              <title>My first HTML Form</title>
+                            </head>
+                            <body>
+	                          <form action="student-radio-response.jsp">
+	                            First name: <input type="text" name="firstName" />
+	                            Last name: <input type="text" name="lastName" />
+	                            Favorite Programming Language: <br/>
+	                            <input type="radio" name="favoriteLanguage" value="Java">Java
+	                            <input type="radio" name="favoriteLanguage" value="C#">C#
+	                            <input type="radio" name="favoriteLanguage" value="PHP">PHP
+	                            <input type="radio" name="favoriteLanguage" value="Ruby">Ruby
+	                            <input type="submit" value="Submit" />
+	                          </form>
+	                        </body>
+	                      </html>    
+                        //student-radio-response.jsp
+                          <!DOCTYPE HTML PUBLIC "-//W3C-//DTD HTML 4.0 Transitional//EN">
+                          <html>
+                            <head>
+                              <title>Student Res Page</title>
+                            </head>
+                            <body>
+                              <%-- Short cut method only used for displaying form data-->
+                              The student is confirmed: ${param.firstName} ${param.lastName}
+                              
+                              <br/><br/>
+    
+                              The student's favorite programming language: ${param.favoriteLanguage}
+    
+                              <%-- <%= request.getParameter("firstName") %> -->
+                              <%-- <%= request.getParameter("lastName") %> -->
+                              <%-- <%= request.getParameter("favoriteLanguage") %> -->
+                            </body>
+                          </html>
+                    -> CheckBox
+					    //student-checkbox-form.html
+	                      <!DOCTYPE HTML PUBLIC "-//W3C-//DTD HTML 4.0 Transitional//EN">
+	                      <html>
+	                        <head>
+	                          <title>My first HTML Form</title>
+	                        </head>
+	                        <body>
+		                      <form action="student-checkbox-response.jsp">
+		                        First name: <input type="text" name="firstName" />
+		                        Last name: <input type="text" name="lastName" />
+		                        Favorite Programming Language: <br/>
+		                        <input type="checkbox" name="favoriteLanguage" value="Java">Java
+		                        <input type="checkbox" name="favoriteLanguage" value="C#">C#
+		                        <input type="checkbox" name="favoriteLanguage" value="PHP">PHP
+		                        <input type="checkbox" name="favoriteLanguage" value="Ruby">Ruby
+		                        <input type="submit" value="Submit" />
+		                      </form>
+		                    </body>
+		                  </html>    
+	                    //student-checkbox-response.jsp
+	                      <!DOCTYPE HTML PUBLIC "-//W3C-//DTD HTML 4.0 Transitional//EN">
+	                      <html>
+	                        <head>
+	                          <title>Student Res Page</title>
+	                        </head>
+	                        <body>
+	                          <%-- Short cut method only used for displaying form data-->
+	                          The student is confirmed: ${param.firstName} ${param.lastName}
+	                          
+	                          <br/><br/>
+
+	                          Favorite programming languages: 
+	                          <ul>
+	                            <%
+	                              String[] languages = request.getParameterValues("favoriteLanguage");
+	                              for(String language : languages){
+	                                out.println("<li>"+ language +"</li>");
+	                              }
+	                            %>
+	                          </ul>
+
+	                          <%-- <%= request.getParameter("firstName") %> -->
+	                          <%-- <%= request.getParameter("lastName") %> -->
+	                        </body>
+	                      </html>    
+			    Cookies
+			        + What is the purpose of Cookies?
+			         Personalize a web site for a user.
+			         Keep track of user preferences
+			           .Favorite Programming Languages
+			           .Favorite departure airport: Philadelphia (PHL)
+			        + What Is a Cookie?
+			         Text data exchanged between web browser and server.
+			          Cookies-Content
+			          .Name/Value pair
+			            name:myApp.favoriteLanguage
+			            value:Java
+			            ...
+			            name:myApp.favoriteCity
+			            value:Philadelphia
+			        + Cookie API Package
+			         .Cookie class defined in package: javax.servlet.http
+			          -> Package imported for all JSP pages
+			          Cookie Constructor
+			           Cookie(String name, String value) -> Constructs a cookie with the specified name and value
+			        + Cookies API - Sending Cookies to browser
+			           <%
+			             String favLang =  request.getParameter("favoriteLanguage");
+
+			             //create cookie
+			             Cookie theCookie =  new Cookie("myApp.favoriteLanguage", favLang);
+			             theCookie.setMaxAge(60*60*24*365);  //Total # of seconds
+			             response.addCookie(theCookie);
+			           %>
+			        + Cookies API - Reading Cookies from the Browser
+			           <%
+			             String favLang = "Java";
+			             Cookie[] theCookies = request.getCookies();
+			             if(theCookies != null){
+			               for(Cookie tempCookie : theCookies){
+			                 if("myApp.favoriteLanguage".equals(tempCookie.getName())){
+			                   favLang = tempCookie.getValue();
+			                   break;
+			                 }
+			               }
+			             }
+			           %>    
+			            //cookies-personalize-form.jsp
+			              <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML PUBLIC 4.0">
+			              <html>
+			                <head>
+			                  <title></title>
+			                </head>
+			                <body>
+			                  <form action="cookies-personalize-response.jsp"
+			                    Select your Favorite Programming Language
+			                    <select name="favoriteLanguage">
+			                      <option>Java</option>
+			                      <option>C#</option>
+			                      <option>PHP</option>
+			                      <option>Ruby</option>
+			                    </select>
+    
+			                    <br/> <br/>
+			                    <input type="submit" value="submit" />
+			                  </form>
+			                </body>
+			              </html>
+			            //cookies-personalize-response.jsp
+			              <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML PUBLIC 4.0">
+			              <html>
+			                <head>
+			                  <title></title>
+			                </head>
+			                  <%
+			                    String favLang = request.getParameter("favoriteLanguage");
+			                    Cookie theCookie = new Cookie("myApp.favoriteLanguage", favLang);
+			                    theCookie.setMaxAge(60*60*24*365);
+			                    response.addCookie(theCookie);
+			                  %>
+			                <body>
+			                  Thanks! We set your favorite language to: ${param.favoriteLanguage}
+			                  <br/><br/>
+			                  <a href="cookies-homepage.jsp">Return to homepage.</a>
+			                </body>
+			              </html>
+			            //cookies-homepage.jsp
+			              <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML PUBLIC 4.0">
+			              <html>
+			                <head>
+			                  <title></title>
+			                </head>
+			                <body>
+			                  <h3>Training Portal</h3>
+			                  <%
+			                    String favLang = "Java";
+    
+			                    Cookie[] theCookies = request.getCookies();
+			                    if(theCookies != null){
+			                       for(Cookie theCookie : theCookies){
+			                         if("myApp.favoriteLanguage".equals(theCookie.getName())){
+			                           favLang = theCookie.getValue();
+			                           break;
+			                         }
+			                       }
+			                    }
+			                  %>
+    
+			                  <h4>New Books for <%= favLang %></h4>
+			                  <ul>
+			                    <li>Blah blah blah</li>
+			                    <li>Blah blah blah</li>
+			                  </ul>
+    
+			                  <h4>Latest News reports for <%= favLang %></h4>
+			                  <ul>
+			                    <li>Blah blah blah</li>
+			                    <li>Blah blah blah</li>
+			                  </ul>
+    
+			                  <h4>Hot Jobs for Java <%= favLang %></h4>
+			                  <ul>
+			                    <li>Blah blah blah</li>
+			                    <li>Blah blah blah</li>
+			                  </ul>
+			                </body>
+			              </html>  
+			[SERVLETS]
+			  What are Servlets?
+			   .Java Class that is processed on the server
+			   .Java Class generates HTML that is returned to browser
+			   .Can read HTML form data, use cookies and sessions, etc...
+			   .At a high-level, similar functionality to JSPs
+
+			    //HelloWorldServlet.java
+			     @WebServlet("/HelloServlet")
+			     public class HelloWorldServlet extends HttpServlet {
+			       protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			         throws ServletException, IOException {
+
+			         //Step1: set the content type
+			         response.setContentType("text/html");
+
+			         //Step2: get the printWriter
+			         PrintWriter out = response.getWriter();
+
+			         //Step3: generate HTML content
+			         out.println("<html><body>");
+			         out.println("<h2>Hello World</h2>");
+			         out.println("<hr/>");
+			         out.println("Time on the server is: "+ new java.util.Date());
+			         out.println("</body></html>");
+			       }
+			     }
+	        [JSF]
+	            -> What is the JavaServer Faces (JSF) framework?
+	              .Framework for building web appicatcions in Java
+	              .Standard of Java Enterprise Edition (Java EE)
+	              .Based on Model-View-Controller design-pattern
+	            -> Model-View-Controller Design Pattern
+	               Controller: Routes Web Request, Calls Java Code
+	               Model: Provide access to data (DB, Web Service, ...)
+	               View: Provide a fiew of the data, Generate an HTML page
+	            -> Benefits of JSF
+	              .Standard way of building web apps UIs in Java
+	              .Leverage a set of reusable UI components
+	              .Help manage application state for web request
+	              .Process form data: validation, convertion, etc...
+	            -> Third-Party JSF UI Components
+	              OpenFaces: www.openfaces.org
+	              RichFaces: www.richfaces.jboss.org
+	              PrimeFaces: www.primefaces.org
+	            -> JSF UI Components
+	              .JSF includes components that will generate HTML for you :-)
+	               JSF UI Component           Description
+	                 h:form                    main form container
+	                 h:inputText               text field
+	                 h:textArea	             multi-line text field
+	                 h:selectBooleanCheckBox   check box
+	                 h:selectOneRatio          radio buttons
+	                 h:selectOneListBox        drop down list
+	                 ...
+	            -> JSF Page Structure
+	             .Most common configuration is to use .xhtml file extension
+	             . HTML page with special JSF tags
+	                <html>
+	                 ...regular html...
+	                 ... JSF tags ...
+	                 ... more html ...
+	                 </html>
+	            -> JSF Behind the Scenes
+	                Componentes of a JSF Application
+	                 .A set of web pages to layout UI components (Facelets)
+	                 .A set of managed beans
+	                 .A web deployment descriptor (web.xml)
+	                 .Optionally
+	                   - Application configuration files (faces-config.xml)
+	                   - custom objects, components, custom tags and validators
+	              How JSF Works Behind the Scenes
+	              JSF Versions
+	                JSF Version    Release Date     Java EE Version
+	                  JSF 1.0        2004             J2EE 1.4
+	                  JSF 1.2        2006             Java EE5
+	                  JSF 2.0        2009             Java EE6
+	                  JSF 2.2        2013             Java EE7
+	              Application Server Support
+	                Full Java EE 7 server: JSF 2.2 libraries already included
+	                 .JBoss Wildfly 8, Glassfish 4, ...
+	                 .Tomcat 8 -> Need to add JSF libraries, preferible JSF2.2
+	            -> [Eclipse]
+	              File> New> Dynamic Web Project
+	              https://www.youtube.com/watch?v=06bXfIYoKaE&index=11&list=PLEAQNNR8IlB4S8nNUlS0ArfgU1nXlhdRu
+		    [NetBeans] https://netbeans.org/kb/trails/java-ee.html
+		        Creating the Web Application Project
+		          File>New Project 
+		            (Java Web) Web Application
+			    Creating the Entity Class and Session Facade
+			      Creating the Entity Class
+			      Creating the Session Facade
+			    Creating the JSF Managed Bean and JSF Pages
+			      File>New>Others
+			        (JavaServer Faces) JSF Managed Bean
+			        Class Name: MessageView
+			        Package: my.presentation
+			        . . . . .
+			        Name: MessageView
+			        Scope: request
+			    Creating the Managed Bean
+			    Modifying the Index Page
+			      File> New> Other
+			        File Name: theend
+			        Project: SimpleEE6App
+			        Location: Web Pages
+			        Options Facelets
+			    Creating the Results 
+            [FirstCup] https://docs.oracle.com/javaee/7/firstcup/creating-example001.htm
+		+ A Web Module That Uses Java Servlet Technology: The hello2 Example
+		+ Configuring Web Applications
+
+	Chapter 7, "JavaServer Faces Technology"
+	Chapter 8, "Introduction to Facelets"
+	Chapter 9, "Expression Language"
+	Chapter 10, "Using JavaServer Faces Technology in Web Pages"
+	Chapter 11, "Using Converters, Listeners, and Validators"
+	Chapter 12, "Developing with JavaServer Faces Technology"
+	Chapter 13, "Using Ajax with JavaServer Faces Technology"
+	Chapter 14, "Composite Components: Advanced Topics and an Example"
+	Chapter 15, "Creating Custom UI Components and Other Custom Objects"
+	Chapter 16, "Configuring JavaServer Faces Applications"
+	Chapter 17, "Java Servlet Technology"
+	Chapter 18, "Java API for WebSocket"
+	Chapter 19, "JSON Processing"
+	Chapter 20, "Internationalizing and Localizing Web Applications"
+
+PART IV. Bean Validation
+	Chapter 21, "Introduction to Bean Validation"
+	Chapter 22, "Bean Validation: Advanced Topics"
+
+PART V. Context and Dependency Injection for Java EE
+	Chapter 23, "Introduction to Contexts and Dependency Injection for Java EE"
+	Chapter 24, "Running the Basic Contexts and Dependency Injection Examples"
+	Chapter 25, "Contexts and Dependency Injection for Java EE: Advanced Topics"
+	Chapter 26, "Running the Advanced Contexts and Dependency Injection Examples"
+
+PART VI. Web Services
+	Chapter 27, "Introduction to Web Services"
+	Chapter 28, "Building Web Services with JAX-WS"
+	Chapter 29, "Building RESTful Web Services with JAX-RS"
+	Chapter 30, "Accessing REST Resources with the JAX-RS Client API"
+	Chapter 31, "JAX-RS: Advanced Topics and an Example"
+
+PART VII. Enterprise Beans
+	Chapter 32, "Enterprise Beans"
+ 	Chapter 33, "Getting Started with Enterprise Beans"
+	Chapter 34, "Running the Enterprise Bean Examples"
+	Chapter 35, "Using the Embedded Enterprise Bean Container"
+	Chapter 36, "Using Asynchronous Method Invocation in Session Beans"
+
+PART VIII. Persistence
+	Chapter 37, "Introduction to the Java Persistence API"
+	Chapter 38, "Running the Persistence Examples"
+	Chapter 39, "The Java Persistence Query Language"
+	Chapter 40, "Using the Criteria API to Create Queries"
+	Chapter 41, "Creating and Using String-Based Criteria Queries"
+	Chapter 42, "Controlling Concurrent Access to Entity Data with Locking"
+	Chapter 43, "Creating Fetch Plans with Entity Graphs"
+	Chapter 44, "Using a Second-Level Cache with Java Persistence API Applications"
+
+PART IX. Messaging
+	Chapter 45, "Java Message Service Concepts"
+	Chapter 46, "Java Message Service Examples"
+
+PART X. Security
+	Chapter 47, "Introduction to Security in the Java EE Platform"
+	Chapter 48, "Getting Started Securing Web Applications"
+	Chapter 49, "Getting Started Securing Enterprise Applications"
+	Chapter 50, "Java EE Security: Advanced Topics"
+
+PART XI. Java EE Supporting Technologies
+	Chapter 51, "Transactions"
+	Chapter 52, "Resource Adapters and Contracts"
+	Chapter 53, "The Resource Adapter Examples"
+	Chapter 54, "Using Java EE Interceptors"
+	Chapter 55, "Batch Processing"
+	Chapter 56, "Concurrency Utilities for Java EE"
+
+PART XII. Case Studies
+	Chapter 57, "Duke's Bookstore Case Study Example"
+	Chapter 58, "Duke's Tutoring Case Study Example"
+	Chapter 59, "Duke's Forest Case Study Example"
+
+
+
+
+
+  @3.Creating Your First Java EE Application
+  This chapter gives an overview of the example applications and step-by-step instructions on coding and running the dukes-age web service example application.
+  
+  + 3.1 Architecture of the Example Applications
+    The example applications consist of four main components:
+	. DukesAgeResource, a JAX-RS RESTful web service:
+	  - Resource that calculates the age of Duke, the Java mascot.
+	    Duke was born May 23, 1995, when the first demo of Java technology was publicly released.
+	
+	. DukesBirthdayBean, an enterprise bean:
+	  - Is a local, no-interface view stateless session bean that calculates the difference between the user's age and Duke's age and stores 
+	    the user-submitted data in a Java Persistence API entity.
+
+	. FirstcupUser, a Java Persistence API entity:
+	  - Represents a particular user's birthday. It is stored in a Java DB database table and managed by DukesBirthdayBean's business methods.
+
+	. Firstcup-war, a web application created with JavaServer Faces Facelets technology.
+	  + Accesses DukesAgeResource to display Duke's age, reads in a date provided by the user, accesses DukesBirthdayBean to calculate who is older, 
+	    and then displays the difference in years between the user and Duke and the average age difference of all users.
+
+		The firstcup-war web application consists of the following:
+		- greeting.xhtml: A Facelets-enabled XHTML page, which is a page that uses the JavaServer Faces Facelets tag libraries. Users can type their birth date in a field and submit it for comparison against Duke's birth date.
+		- response.xhtml: A Facelets-enabled XHTML page that tells the user whether he or she is older or younger than Duke, based on the date the user entered in the greeting.xhtml page, and displays the average age difference of all users.
+		- DukesBDay.java: A CDI managed bean that defines properties to hold the user's birth date, uses the JAX-RS Client API to get Duke's current age from the DukesAgeResource web service, and calculates the age difference between the user and Duke from the enterprise bean.
+		- web.xml: The web application's deployment descriptor, which is used to configure certain aspects of a web application when it is installed. In this case, it is used to provide a mapping to the application's FacesServlet instance, which accepts incoming requests, passes them to the life cycle for processing, and initializes resources. It also specifies greeting.xhtml as the welcome file for the application.
+		- WebMessages.properties and WebMessages_es.properties: Java programming language properties files that contain the localized strings used in greeting.xhtml and response.xhtml. By default, the English language strings in WebMessages.properties are used, but Spanish language strings are also provided in WebMessages_es.properties.
+		- DukesBirthdayBean.java: as described above, the enterprise bean packaged within the firstcup-war application. DukesBirthdayBean calculates the difference between the user's birthday and Duke's birthday.
+
+	  3.1.2 Tiers in the Example Applications
+		- WEB Tier Component: The firstcup-war web client.
+		- BUSINESS Tier Component: The DukesAgeResource web service, the FirstcupUser entity, and the DukesBirthdayBean enterprise bean.
+		- ENTERPRISE INFORMATION SYSTEM(EIS):  The data in the Java DB database table
+		- CLIENT Tier Component: The user's web browser is the client tier component, as it accesses the rest of the application through the web tier.
+	  
+	  3.1.3 Java EE Technologies Used in Example Applications
+		- JAX-RS: The DukesAgeResource web service
+		- STATELESS SESSION BEAN: The DukesBirthdayBean enterprise bean.
+		- Java PERSISTENCE API: The FirstcupUser entity
+		- CDI bean The DukesBDay uses the JAX-RS client API to access the DukesAgeResource web service.
+		- The firstcup-war web client is a JavaServer Faces application that runs in the web container of the Java EE server.
+		
+  3.2 Coding the dukes-age Example Application
+    3.2.1 Getting Started
+	  - Register the server with your NetBeans IDE as described in Configuring Your Environment.
+      + Install the Maven archetypes used to create the example applications.
+		. There are two archetypes included in the example, dukes-age-archetype and firstcup-war-archetype.
+		  -> In NetBeans IDE 
+			File>Open Project: 
+			C:\glassfish4.1.1\docs\firstcup\example
+			Right-click the firstcup project in the Projects pane and select Build.
+	
+	3.2.2 Creating the Web Service
+	  The DukesAgeResource endpoint is a simple RESTful web service. 
+	  RESTful web services are web-based applications that use the HTTP protocol to access, modify, or delete information contained within a resource.
+	  A RESTful web service resource is a source of specific information identifiable by a uniform resource identifier (URI), 
+	  for example http://example.com/someResource, and may be manipulated by calling the HTTP protocol's methods, for example GET or POST.
+	  
+	  3.2.2.1 JAX-RS Resources
+	  The basic DukesAgeResource resource class is generated from the dukes-age-archetype Maven archetype. 
+	  This class is annotated with the javax.ws.rs.Path annotation, which specifies the URL suffix to which the resource will respond. 
+	  DukesAgeResource has a single method, getText, annotated with the javax.ws.rs.GET and javax.ws.rs.Produces annotations.
+	  . @GET marks the method as a responder to HTTP GET requests
+	  . @Produces specifies the MIME-type of the response sent back from getText to clients. In this case, the MIME-type is text/plain.
+	  
+	  3.2.2.2 Creating the dukes-age Application Using the Maven Archetype
+	  In NetBeans IDE:
+	  File>New Project
+	  Category: Maven
+	  -> Project from Archetype
+	    Click Next
+		-> Search: dukes-age
+		In the Known Archetypes field, select dukes-age-archetype.
+		Click Next
+		  Project Name: dukes-age
+		  Package: firstcup.dukesage.resource
+		  Click Finish
+		  
+		  The dukes-age-archetype archetype creates the structure of the JAX-RS endpoint application, including:
+		  . The DukesAgeResource resource class
+		  . The web.xml deployment descriptor
+		  Now is your turn to configure how the application will run, implement the functionality of the resource class, and then deploy the application.
+		  
+		  
+		  -> Configure the dukes-age Web Application
+		  Set the default URL that is brought up in a web browser when you run dukes-age.
+		  Right-click on dukes-age project/Properties
+		    Click on Run node
+			-> Set Relative Url to: '/webapi/dukesAge'
+			
+		  -> Within the dukes-age Project:
+  		     Expand Source Packages node
+			   then double-click the com.oracle.ipm.dukes.age.DukesAgeResource.java and replace current code in getText with the following code:
+			   
+				// Create a new Calendar for Duke's birthday
+				Calendar dukesBirthday = new GregorianCalendar(1995, Calendar.MAY, 23);
+				// Create a new Calendar for today
+				Calendar now = GregorianCalendar.getInstance();
+
+				// Subtract today's year from Duke's birth year, 1995
+				int dukesAge = now.get(Calendar.YEAR) - dukesBirthday.get(Calendar.YEAR);
+				dukesBirthday.add(Calendar.YEAR, dukesAge);
+
+				// If today's date is before May 23, subtract a year from Duke's age
+				if (now.before(dukesBirthday)) {
+					dukesAge--;
+				}
+				// Return a String representation of Duke's age
+				return "" + dukesAge;
+		  
+		  Start Glassfish Server through Services tab
+		  -> Both the database server and the GlassFish Server instance will start.
+		  
+		  Building and Deploying the Web Service Endpoint
+		  -> Build dukes-age project
+		     Then Right-click Run
+  			 
+  @4.Creating Your Second Web Application
+    The firstcup-war example application consumes the data from the dukes-age web service using the JAX-RS client API. 
+    A JavaServer Faces web front end asks users to enter their birthdays to find out who is older, the user or Duke. 
+    This data is stored in a Java DB database table using the Java Persistence API. 
+    The business logic, which provides the core functionality of the application, is handled by an enterprise bean.
+    
+    4.1 Creating the firstcup-war Project
+    4.2 Modifying the Java Persistence API
+    4.3 Modifying the Enterprise Bean
+    4.4 Modifying the Web Client
+    4.5 Building, Packaging, Deploying, and Running the firstcup-war Web Application
+
+
+
+  
+  
+**********************************************************************************************************************************
+  @JSF Authentication
+**********************************************************************************************************************************
+  https://www.youtube.com/watch?v=xv2xltxnnBU&list=PLSM8fkP9ppPq4sCyQPfKXxKAo4R1ejPDN
+  @JAAS01.Java Authentication and Authorization Service
+  - Create a Java Project
+    File>New Java Class/package: com.java.security/Class Name: Driver
+	  package com.java.security;
+  	
+	  public class Driver {
+	      public static void main(String[] args){
+			  System.setProperty("java.security.auth.login.config", "jaastutorial.config");
+			  LoginContext loginContext = null;
+			  try{
+			      loginContext = new LoginContext("MeJaasTutorTial", new MeCallbackHandler());
+			  }catch(LoginException e){
+			      e.printStackTrace();
+				  System.exit(0);
+			  }
+  			
+			  while(true){
+				  try{
+					  loginContext.login();
+					  System.exit(0);
+				  }catch(LoginException e){
+					  e.printStackTrace();
+				  }
+			  }
+  			
+		  }
+	  }
+  File>New Java Class/package: com.java.security/Class Name: MeCallBackHandler/Implements:   javax.security.auth.callback.CallbackHandler ->@Override (handle)
+  	
+  File>New Java Class/package: com.java.security/Class Name: MeLoginModule/Implements: javax.security.auth.spi.LoginModule ->  Override (abort|commit|initialize|login|logout)
+	  package com.java.security;
+  	
+	  import java.util.Map;
+	  ...
+  	
+	  public class MeLoginModule implements LoginModule{
+		  public static final String TEST_USERNAME = "user";
+		  public static final STring TEST_PASSWORD = "password";
+		  private CallbackHandler callbackHandler = null;
+		  private boolean authenticationSuccessFlag = false;
+		  @Override
+		  public boolean abort() throws LoginException{ return false; }
+  		
+		  @Override
+		  public boolean commit() throws LoginException{ return false; }
+  		
+		  @Override 
+		  public void initialize(Subject arg0, CallbackHandler callbackHandler, Map<String, ?> arg2, Map<String, ?> arg3{
+		      this.callBackHandler = callbackHandler;
+		  }
+  		
+		  @Override
+		  public boolean login() throws LoginException { 
+		      Callback[] callbackArray = new Callback[2];
+			  callbackArray[0] = new NameCallback("User Name: ");
+			  callBackArray[1] = new PasswordCallback("Password: ", false);
+			  try{
+			  }catch(IOException e){
+			      e.printStackTrace();
+			  }catch(UnsupportedCallbackException e){
+				  e.printStackTrace();
+			  }
+			  String name = ((NameCallback) callbackArray[0].getName();k
+			  callbackHandler.handler(callbackArray);
+			  return false; 
+		  }
+  		
+		  @Override
+		  public boolean logout() throws LoginException { return false; }
+  		
+	  }
+  	
+    File>New File/jaastutorial.config
+      MeJaasTutorial{
+	    com.java.security.iLoginModule required;
+	  }
+  
+  
+  @JAAS02.Java Web App.Authentication <GlassFish_BASIC>
+  - Create a GlassFish Web App. having:
+    . A servlet that returns a simple string if succesfully accessed
+    . A web.xml file having the following defined:
+      - A role that users trying to access the servlet must belong to 
+	  - An authentication mechanism & a realm name
+    . A sun-web.xml file where the role specified in web.xml is mapped to a group
+  - Setup a Glassfish user w/ username & password & belonging to the group specified in sun-web.xml
+  - Test run the web app
+    
+  
+    File>New 'Web Project'
+    Project Name: JavaWebSecurity01
+    Target runtime: GlassFish 3.1.2
+  
+	  File>New 'Servlet'
+	  Project: JavaWebSecurity01
+	  Source folder: /JavaWebSecurity01/src
+	  Java Package: com.web.auth
+	  Class Name: AuthenticationServlet
+	  Superclass: javax.servlet.http.HttpServlet
+  
+		  //AuthenticationServlet.java
+		  package com.web.auth;
+  		
+		  import javax.servlet.annotation.WebServlet;
+		  import javax.servlet.http.HttpServlet;
+		  import java.io.IOException;
+		  import javax.servlet.ServletException;
+		  import javax.servlet.http.HttpServletRequest;
+		  import javax.servlet.http.HttpServletResponse;
+		  import java.io.PrintWriter;
+  		
+		  @WebServlet("/AuthenticationServlet")
+		  public class AuthenticationServlet extends HttpServlet {
+		    private static final long serialVersionUID = 1L;
+  		  
+		    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		        PrintWriter printWriter =response.getWriter();
+			    response.setContentType("text/html");
+			    response.getWriter().println("success...");
+		    }
+		  }
+  
+		  //web.xml	
+		  <?xml version="1.0" encoding="UTF-8"?>
+		<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"   xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+			  <security-constraint>
+				  <web-resource-collection>
+					  <web-resource-name>Simple Web Resource</web-resource-name>
+					  <url-pattern>/AuthenticationServlet</url-pattern>
+				  </web-resource-collection>
+				  <auth-constraint>
+					  <role-name>users</role-name>
+				  </auth-constraint>
+			  </security-constraint>
+			  <login-config>
+				  <auth-method>BASIC</auth-method>
+				  <realm-name>file</realm-name>
+			  </login-config>
+		  </web-app>
+  
+  		
+		  //sun-web.xml
+		  <?xml version="1.0" encoding="utf-8"?>
+		<!DOCTYPE sun-web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Application Server 9.0 Servlet 2.5//EN" "http://  www.sun.com/..."
+		  <sun-web-app error-url="">
+			  <security-role-mapping>
+				  <role-name>user</role-name>
+				  <group-name>users</group-name>
+			  </security-role-mapping>
+		  </sun-web-app>
+  		
+		  //http://localhost:4848
+		  Configurations>default-config/Security/Realms/file
+		    -> Manage Users
+		    Click on New
+		      Realm Name: file
+		      User Id: iUser
+			  Group List: users
+			  password: ******
+  
+  
+  @JAAS03.Java Web App.Authentication <Tomcat_BASIC>
+  
+    File>New 'Web Project'
+    Project Name: JavaWebSecurity02
+    Target runtime: Tomcat v7.0
+  
+	  File>New 'Servlet'
+	  Project: JavaWebSecurity02
+	  Source folder: /JavaWebSecurity02/src
+	  Java Package: com.web.auth
+	  Class Name: AuthenticationServlet
+	  Superclass: javax.servlet.http.HttpServlet
+  
+		  //AuthenticationServlet.java
+		  package com.web.auth;
+  		
+		  import javax.servlet.annotation.WebServlet;
+		  import javax.servlet.http.HttpServlet;
+		  import java.io.IOException;
+		  import javax.servlet.ServletException;
+		  import javax.servlet.http.HttpServletRequest;
+		  import javax.servlet.http.HttpServletResponse;
+		  import java.io.PrintWriter;
+  		
+		  @WebServlet("/AuthenticationServlet")
+		  public class AuthenticationServlet extends HttpServlet {
+		    private static final long serialVersionUID = 1L;
+  		  
+		    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		        PrintWriter printWriter =response.getWriter();
+			    response.setContentType("text/html");
+			    response.getWriter().println("success...");
+		    }
+		  }
+  	
+          //web.xml	
+		  <?xml version="1.0" encoding="UTF-8"?>
+		<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"   xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+			  <security-constraint>
+				  <web-resource-collection>
+					  <web-resource-name>simple web resource</web-resource-name>
+					  <url-pattern>/AuthenticationServlet</url-pattern>
+				  </web-resource-collection>
+				  <auth-constraint>
+					  <role-name>users</role-name>
+				  </auth-constraint>
+			  </security-constraint>
+			  <login-config>
+				  <auth-method>BASIC</auth-method>
+			  </login-config>
+		  </web-app>
+  
+		  //tomcat-users.xml
+		  <?xml version="1.0" encoding="UTF-8"?>
+		  <tomcat-users>
+		    <role rolename="users"/>
+		    <user password="admin" roles="user" username="user" />
+		  </tomcat-users>
+  
+  
+  @JAAS04.Java Web App.Authentication <GlassFish_FORM>
+  - Create a GlassFish Web App. having:
+    . A servlet that returns a simple string if succesfully accessed
+    . An html authentication page
+    . An html authentication error page
+    . A web.xml file having the following defined:
+      - A role that users trying to access the servlet must belong to 
+	  - A FORM authentication mechanism & a realm name
+    . A sun-web.xml file where the role specified in web.xml is mapped to a group
+  - Setup a Glassfish user w/ username & password & belonging to the group specified in sun-web.xml
+  - Test run the web app
+  
+    File>New 'Web Project'
+    Project Name: JavaWebSecurity03
+    Target runtime: GlassFish 3.1.2
+  
+	  File>New 'Servlet'
+	  Project: JavaWebSecurity03
+	  Source folder: /JavaWebSecurity03/src
+	  Java Package: com.web.auth
+	  Class Name: AuthenticationServlet
+	  Superclass: javax.servlet.http.HttpServlet
+  
+		  //AuthenticationServlet.java
+		  package com.web.auth;
+  		
+		  import javax.servlet.annotation.WebServlet;
+		  import javax.servlet.http.HttpServlet;
+		  import java.io.IOException;
+		  import javax.servlet.ServletException;
+		  import javax.servlet.http.HttpServletRequest;
+		  import javax.servlet.http.HttpServletResponse;
+		  import java.io.PrintWriter;
+  		
+		  @WebServlet("/AuthenticationServlet")
+		  public class AuthenticationServlet extends HttpServlet {
+		    private static final long serialVersionUID = 1L;
+  		  
+		    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		        PrintWriter printWriter =response.getWriter();
+			    response.setContentType("text/html");
+			    response.getWriter().println("success...");
+		    }
+		  }
+  
+		  //web.xml	
+		  <?xml version="1.0" encoding="UTF-8"?>
+		<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"   xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+			  <security-constraint>
+				  <web-resource-collection>
+					  <web-resource-name>Simple Web Resource</web-resource-name>
+					  <url-pattern>/AuthenticationServlet</url-pattern>
+				  </web-resource-collection>
+				  <auth-constraint>
+					  <role-name>users</role-name>
+				  </auth-constraint>
+			  </security-constraint>
+			  <login-config>
+				  <auth-method>FORM</auth-method>
+				  <realm-name>file</realm-name>
+				  <form-login-config>
+					  <form-login-page>/authentication.html</form-login-page>
+					  <form-error-page>/authentication_error.html</form-error-page>
+				  </form-login-config>
+			  </login-config>
+		  </web-app>
+  
+  		
+		  //sun-web.xml
+		  <?xml version="1.0" encoding="utf-8"?>
+		<!DOCTYPE sun-web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Application Server 9.0 Servlet 2.5//EN" "http://  www.sun.com/..."
+		  <sun-web-app error-url="">
+			  <security-role-mapping>
+				  <role-name>user</role-name>
+				  <group-name>users</group-name>
+			  </security-role-mapping>
+		  </sun-web-app>
+  
+	  -> Let's create our application login/error page
+	  File New>HTML
+	  File Name: authentication.html
+  	
+		  <!DOCTYP html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+		  <html>
+		      <head>
+			      <meta http-equiv="Content-type" content="text/html; charset=ISO-8859-1">
+				  <title>Application Login Page</title>
+			  </head>
+			  <body>
+				  <h1>Sign In:</h1>
+				  <form method="POST" action="j_security_check">
+					  Username: <br/>
+					  <input type="text" name="j_username" size="20"/><br/>
+					  Password: <br/>
+					  <input type="password" name="j_username" size="20"/><br/>
+					  <input type="submit" value="Sign In"/>
+				  </form>
+			  </body>
+		  </html>
+  
+	  File New>HTML
+	  File Name: authentication_error.html 
+  		
+		  <!DOCTYP html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+		  <html>
+		      <head>
+			      <meta http-equiv="Content-type" content="text/html; charset=ISO-8859-1">
+				  <title>Authentication error</title>
+			  </head>
+			  <body>Please supply the correct username and password combination</body>
+		  </html>
+  
+	  //http://localhost:4848
+		  Configurations>default-config/Security/Realms/file
+		    -> Manage Users
+		    Click on New
+		      Realm Name: file
+		      User Id: iUser2
+			  Group List: users
+			  password: ******
+  
+  
+  @JAAS05.Java Web App.Authentication <Tomcat_FORM>
+  - Create a TOMCAT 7 Web App. having:
+    . A servlet that returns a simple string if succesfully accessed
+    . An html authentication page
+    . An html authentication error page
+    . A web.xml file having the following defined:
+      - A role that users trying to access the servlet must belong to 
+	  - An FORM authentication mechanism & a realm name
+    . A sun-web.xml file where the role specified in web.xml is mapped to a group
+  - Setup a TOMCAT user in the tomcat-users.xml file w/ username & password & belonging 
+    to the role that was specified in web.xml
+  - Test run the web app
+  
+    File>New 'Web Project'
+    Project Name: JavaWebSecurity04
+    Target runtime: Apache Tomcat v7.0
+    Context root: JavaWebSecurity04
+    Content directory: WebContent
+    -> Generate web.xml
+  
+	  File>New 'Servlet'
+	  Project: JavaWebSecurity04
+	  Source folder: /JavaWebSecurity04/src
+	  Java Package: com.web.auth
+	  Class Name: AuthenticationServlet
+	  Superclass: javax.servlet.http.HttpServlet
+  
+		  //AuthenticationServlet.java
+		  package com.web.auth;
+  		
+		  import javax.servlet.annotation.WebServlet;
+		  import javax.servlet.http.HttpServlet;
+		  import java.io.IOException;
+		  import javax.servlet.ServletException;
+		  import javax.servlet.http.HttpServletRequest;
+		  import javax.servlet.http.HttpServletResponse;
+		  import java.io.PrintWriter;
+  		
+		  @WebServlet("/AuthenticationServlet")
+		  public class AuthenticationServlet extends HttpServlet {
+		    private static final long serialVersionUID = 1L;
+  		  
+		    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		        PrintWriter printWriter =response.getWriter();
+			    response.setContentType("text/html");
+			    response.getWriter().println("success...");
+		    }
+		  }
+  
+		  //web.xml	
+		  <?xml version="1.0" encoding="UTF-8"?>
+		<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"   xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+			  <security-constraint>
+				  <web-resource-collection>
+					  <web-resource-name>Simple Web Resource</web-resource-name>
+					  <url-pattern>/AuthenticationServlet</url-pattern>
+				  </web-resource-collection>
+				  <auth-constraint>
+					  <role-name>users</role-name>
+				  </auth-constraint>
+			  </security-constraint>
+			  <login-config>
+				  <auth-method>FORM</auth-method>
+				  <realm-name>file</realm-name>
+				  <form-login-config>
+					  <form-login-page>/authentication.html</form-login-page>
+					  <form-error-page>/authentication_error.html</form-error-page>
+				  </form-login-config>
+			  </login-config>
+		  </web-app>
+  
+  		
+		  //sun-web.xml
+		  <?xml version="1.0" encoding="utf-8"?>
+		<!DOCTYPE sun-web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Application Server 9.0 Servlet 2.5//EN" "http://  www.sun.com/..."
+		  <sun-web-app error-url="">
+			  <security-role-mapping>
+				  <role-name>user</role-name>
+				  <group-name>users</group-name>
+			  </security-role-mapping>
+		  </sun-web-app>
+  
+	  -> Let's create our application login/error page
+	  File New>HTML
+	  File Name: authentication.html
+  	
+		  <!DOCTYP html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+		  <html>
+		      <head>
+			      <meta http-equiv="Content-type" content="text/html; charset=ISO-8859-1">
+				  <title>Application Login Page</title>
+			  </head>
+			  <body>
+				  <h1>Sign In:</h1>
+				  <form method="POST" action="j_security_check">
+					  Username: <br/>
+					  <input type="text" name="j_username" size="20"/><br/>
+					  Password: <br/>
+					  <input type="password" name="j_username" size="20"/><br/>
+					  <input type="submit" value="Sign In"/>
+				  </form>
+			  </body>
+		  </html>
+  
+	  File New>HTML
+	  File Name: authentication_error.html 
+  		
+		  <!DOCTYP html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+		  <html>
+		      <head>
+			      <meta http-equiv="Content-type" content="text/html; charset=ISO-8859-1">
+				  <title>Authentication error</title>
+			  </head>
+			  <body>Please supply the correct username and password combination</body>
+		  </html>
+  
+	  //http://localhost:4848
+		  Configurations>default-config/Security/Realms/file
+		    -> Manage Users
+		    Click on New
+		      Realm Name: file
+		      User Id: iUser2
+			  Group List: users
+			  password: ******
+  
+**********************************************************************************************************************************
+  @JSF Navigation
+**********************************************************************************************************************************
+  @NAV01.Implicit
+    File>New Project
+    Category: Java Web | Project:  Web Application
+    :Name And Location:
+      Project Name: WebApplication1
+    :Server and Settings:
+      Server: GlassFish Server 4.1.1
+      Java EE Version: Java EE 7 Web
+      Contex Path: /WebApplication1
+    :Frameworks:
+      -> JavaServer Faces
+    Click on Finish
+  
+    -> Defining the page to display
+    ~%ProjectFolder%/Web Pages/WEB-INF/web.xml
+      <?xml version="1.0" encoding="UTF-8"?>
+	  <web-app version="2.5" 
+		  	  xmlns="http://java.sun.com/xml/ns/javaee"
+			  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+			  xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3.1.xsd">
+	    ...
+	    <welcome-file-list>
+	      <welcome-file>faces/index.xhtml</welcome-file>
+	    </welcome-file-list>
+	  </web-app>  
+	  ...
+  	
+  	
+	  ~%ProjectFolder%/Web Pages/index.xhtml
+	  <?xml version='1.0' encoding='UTF-8' ?>
+	  <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+	  <html xmlns="http://www.w3.org/1999/xhtml"
+		    xmlns:h="http://xmlns.jcp.org/jsf/html">
+		  <h:head>
+			  <title>Index</title>
+		  </h:head>
+		  <h:body>
+			  Hello from Facelets 'index.xhtml'
+			  <h:form>
+				  <h:link value="Inicio" outcome="navigation" /><br/>
+				  <h:commandLink value="Inicio[CL]" action="navigation"/><br/>
+				  <h:commandButton value="Inicio[CB]" action="navigation"/><br/>
+			  </h:form>
+		  </h:body>
+	  </html>
+  	
+    
+    -> Let's create a JSF page in order to prove our Navigation
+    File>New JSF Page
+    File Name: navegation
+    :Options:
+      -> Facelets
+    Click on finish	
+    
+        ~%ProjectFolder%/Web Pages/index.xhtml
+        <?xml version='1.0' encoding='UTF-8' ?>
+	    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+	    <html xmlns="http://www.w3.org/1999/xhtml"
+		    xmlns:h="http://xmlns.jcp.org/jsf/html">
+		  <h:head>
+			  <title>Navigation</title>
+		  </h:head>
+		  <h:body>
+			  Hello from Facelets 'navigation.xhtml'
+	      </h:body>
+	    </html>
+  
+    NOTE:
+    commandLink/commandButton uses javascript snippets and the view linked is displayed within the index.xhtml 
+    -> http://localhost:8080/WebApplication1/faces/navigation.xhtml
+  *When we don't define any folder for our JSP Faces those are referenced from the Browser within the http://.../  faces/'JSPFace_NAME.xhtml'
+    
+    
+  @NAV02.Dinamyc Navigation (commandLink/commandButton):
+    File>New JSF Page
+    File Name: dinamyc
+    :Options:
+      -> Facelets
+    Click on finish
+          
+		  ~%ProjectFolder%/Web Pages/dinamyc.xhtml
+		  <?xml version='1.0' encoding='UTF-8' ?>
+		  <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+		  <html xmlns="http://www.w3.org/1999/xhtml"
+			    xmlns:h="http://xmlns.jcp.org/jsf/html">
+			  <h:head>
+				  <title>Dinamyc</title>
+			  </h:head>
+			  <h:body>
+				  Hello from Facelets
+				  <h:form>
+					  <h:commandLink value="Page1" action="page1"/>
+					  <h:commandLink value="Page2" action="page2"/>
+				  </h:form>
+			  </h:body>
+		  </html>
+  
+  		
+		  ~%ProjectFolder%/Web Pages/WEB-INF/faces-config.xtml
+		  <?xml version='1.0' encoding='UTF-8'?>
+		  <faces-config version="2.2"
+					    xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+					    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+					  xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/  web-facesconfig_2_2.xsd">
+  
+			  <navigation-rule>
+				  <from-view-id>dinamyc.xhtml</from-view-id>
+				  <navigation-case>
+					  <from-action>page1</from-action>
+					  <to-view-id>page1.xthml</to-view-id>
+				  </navigation-case>
+				  <navigation-case>
+					  <from-action>page2</from-action>
+					  <to-view-id>page2.xthml</to-view-id>
+				  </navigation-case>
+			  </navigation-rule>
+  				
+		  </faces-config>
+  
+		  File>New JSF Page
+		  File Name: pagina1
+		  -> Click on Finish
+  		
+		      ~%ProjectFolder%/Web Pages/pagina1.xhtml
+			  <?xml version='1.0' encoding='UTF-8' ?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/  xhtml1-transitional.dtd">
+			  <html xmlns="http://www.w3.org/1999/xhtml"
+				    xmlns:h="http://xmlns.jcp.org/jsf/html">
+				  <h:head>
+					  <title>Pagina1</title>
+				  </h:head>
+				  <h:body>
+					  <h1>Pagina1</h1>
+				  </h:body>
+			  </html>
+  		
+		  File>New JSF Page
+		  File Name: pagina2
+		  -> Click on Finish
+  		
+		      ~%ProjectFolder%/Web Pages/pagina1.xhtml
+			  <?xml version='1.0' encoding='UTF-8' ?>
+			<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/  xhtml1-transitional.dtd">
+			  <html xmlns="http://www.w3.org/1999/xhtml"
+				    xmlns:h="http://xmlns.jcp.org/jsf/html">
+				  <h:head>
+					  <title>Pagina2</title>
+				  </h:head>
+				  <h:body>
+					  <h1>Pagina2</h1>
+				  </h:body>
+			  </html>
+
+
+  
+
+	 

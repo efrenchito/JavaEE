@@ -1,4 +1,28 @@
 https://www.mhprofessional.com/oraclepressbooks/downloads_list
+@CHAPTER1: Introduction to Java EE and HTML5 Enterprise
+    Development Tools
+     Three main development tools are used throughout this book: NetBeans IDE, Java EE 7, and HTML5.
+      NetBeans
+        NetBeans IDE is the development tool you will use throughout this book. It provides features such as editors, templates, and code generators that make it a perfect fit for creating applications that use Java EE 7 and HTML5.
+      Java EE 7      
+        Java Platform, Enterprise Edition (Java EE) provides a standardsbased platform for developing web and enterprise 
+        applications. The platform consists of multiple components that enable developers to build these applications.
+        In addition, the Java EE 7 platform provides several other components:
+         ■ Batch Applications for the Java Platform
+         ■ Java Message Service (JMS)
+         ■ Contexts and Dependency Injection (CDI)
+         ■ Concurrency Utilities
+         ■ JavaServer Faces (JSF)
+         ■ Java Servlet Technology
+      HTML5
+        While most people believe HTML5 is relatively new, it has actually been in development since 2004. The World Wide
+        Web Consortium (W3C) designed the original specification to address what it observed as common uses of HTML and
+        XHTML across the Internet at the time.
+
+        Thankfully, several websites have been created to help developers navigate this
+        tricky area of developing HTML applications. Two of the more popular sites are
+        ■ HTML5 Test http://html5test.com/
+        ■ Can I Use http://caniuse.com/
 
 @Chapter2: PERSISTENCE
     Overview

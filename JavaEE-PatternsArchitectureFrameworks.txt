@@ -280,3 +280,99 @@ Data/Integration Layer
      Some use cases take long time to run
      Instead of Blocking user, these can be run asynchronously
      Implementations -> Threads/JMS/Job Farm
+Other Significant things You Would need to know
+    Caching
+     Component that stores data so future requests for that data can be served faster.
+     The data stored in a cache might be the resutl of an earlier computation, or the duplicate of data elsewhere
+     Implementations
+       -> Distributed Cache, Session, Business Layer Cache, Data Layer Cache, Hibernate
+    Aspected Oriented Programming (AOP)
+     Is tipically used when we're talking about Cross Cutting Concerns (Login/Performance/Security) envolves more than one layer.
+     Increase modularity by allowing the separation of cross-cutting concerns.
+     //Static - Compile Time
+      Aspect: Is the concern that we are trying to implement generically. Ex: logging, transaction management, performance tracing
+      Advice: The specific aspect of the  concern we are implementing. The action taken by an aspect at a particular join point.
+        Different types of advice include "arround", "before" and "after" advice
+      Pointcut: An expression which determines what are the methods that the Advice should be applied on.
+
+        //MyAspect.java
+         ...
+         @Configuration
+         @EnableAspectJAutoProxy
+         @ComponentScan(basePackages = { "com.in28minutes.example.spring.business.aop"})
+         class SpringContextAOP {
+
+         }
+
+         @Aspect
+         @Component
+         Class MyAspect{
+            @Before("execution(* com.in28minutes.example.spring.business.aop.HyByeService.*(...))")
+            public void before(JoinPoint joinPoint) {
+              System.out.print("Before ");
+              System.out.print(joinPoint.getSignature().getName() + " called with ");
+              System.out.println(Arrays.toString(joinPoint.getArgs()));
+            }
+
+            @AfterReturning(pointCut = "execution(* com.in28minutes.example.spring.business.aop.HyByeService.*(...))"
+                           ,returning = "result")
+            public void after(JoinPoint joinPoint, Object result){
+              System.out.print("After");
+              System.out.print(joinPoint.getSignature().getName());
+              System.out.print(" result is " + result);
+            }
+         ...
+    Dependency Injection -> @AutoWired | @PersistenceContext
+     Is one of the most importan things that has changed how we are doing things today.
+     When SpringFramework introduces DI fifteen years ago, it was quite a revolution.
+     DI is very simple, instead of getting what I need the framework provides to me.
+        //StudentRepository.java
+         @Repository
+         import ...
+         public class StudentRepository {
+
+           @PersistenceContext
+           private EntityManager entityManager;
+
+           public Student getStudent(final long id) {
+             return entityManager.find(Student.class, id);
+           }
+
+           public Student insertStudent(Student student) {
+             if(student.getPassword() != null)
+               entityManager.merge(student.getPassword());
+             return entityManager.merge(student);
+           }
+
+           public Student updateStudent(Student student){
+             entityManager.merge(student);
+             return student;
+           }
+
+           public Student retrieveStudentsFrom(String string){
+             return null;
+           }
+
+           public List<Student> getAllStudents(){
+             Query query = entityManager.createNamedQuery("Find all students");
+         ...
+        //TodoController.java
+          package com.in28minutes.todo;
+
+          import java.text.SimpleDateFormat,
+
+          @Controller
+          @SessionAttributes("name")
+          public class TodoController {
+
+            private Log logger = LogFact;
+
+            @AutoWired
+            TodoService service;
+
+            @InitBinder
+            protected void initBinder(WebDataBinder	 initBinder){
+             SimpleDateFormat SimpleDateFormat = new SimpleDateFormat("dd/MM/yy");
+             binder.registerCustomEditor(Date.class, new CustomDateEditor...
+          ...
+     Java is trying to catch up with CDI (Context Dependency Injection)
