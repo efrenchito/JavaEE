@@ -1,0 +1,118 @@
+http://file.allitebooks.com/20151209/Data%20Structures%20and%20the%20Java%20Collections%20Framework,%203rd%20Edition.pdf
+http://bcs.wiley.com/he-bcs/Books?action=resource&bcsId=6226&itemId=0470482672&resourceId=23401
+
+Chapter0.Introduction to java
+  CHAPTER OBJECTIVES
+   1. Learn (or review) the fundamentals of Java, including classes, objects and messages.
+   2. Be able to use javadoc in writing method specifications.
+   3. Incorporate the Scanner class into your programming.
+   4. Understand the significance of the fact that a copy of the argument is stored in the corresponding parameter when a method is called.
+   5. Understand the details of arrays and output formatting.
+
+   0.1. Java Fundamentals
+     A Java Program is a collections of classes. Basically a class consist of variables(fields)
+     together with functions(methods) that operate on those fields. A program is executed when a
+     special method(main) is called by the JVM.
+
+       public class HelloWorld{
+         public static void main(String[] args){
+           System.out.println("Hello, World!!!");
+         }
+       }
+
+    0.1.1 Primitive Types
+      A primitive type is a collection of values, together with operations that can be performed on those values.
+      [boolean;char;byte;short;int;long;double;float;]
+
+        int score;
+        score = 0;
+        score = 88;
+        score = (score + 3) / 10; //=> 9
+        score = 91 % 10; // => 1
+
+      char: Includes all of the ASCII/Unicode characters. escape sequences are used for print control:
+       -'\n' new-line character
+       -'\t' tab character
+         char c = '\u263A'; //=)
+
+   0.2 Classes
+     In addition to primitive types such as int and char, Java provides programmers
+     with the ability to create powerful new types called "classes".
+
+     0.2.1 The String Class
+       String s1 = new String();
+       String s2 = new String("transparent");
+
+    0.2.2 Using javadoc Notation for Method Specifications
+
+    0.2.3 Equality of References and Equality of Objects
+      equals -> The result is true if and only if the argument is not null and is a String object that represents the same sequence of characters as this String object.
+      The == operator simply compares two references: true is returned if and only if the two references contain the same address.
+        String s4 = new String ("restful"),
+        s5 = new String ("restful"),
+        s6 = new String ("peaceful"),
+        s7 = s4,
+        s8 = "restful",
+        s9 = "restful";
+        System.out.println (s4.equals (s5)); // the output is "true"
+        System.out.println (s4.equals (s6)); // the output is "false"
+        System.out.println (s4 == s5); // the output is "false"
+        System.out.println (s4 == s7); // the output is "true"
+        System.out.println (s4 == s8); // the output is "false"
+        System.out.println (s8 == s9); // the output is "true"
+
+    0.2.4 Local Variables
+      Variables declared within a method—including the method’s parameters—are called local variables.
+      -> Local variables must be explicitly initialized before they are used. otherwise compilation will complain
+       //ExplicitlyInitialized1 -> Compilation error
+        public void run(){
+          int k;
+          System.out.println("isPrime("+k+")");
+        } // method run
+       //ExplicitlyInitialized2 -> Compilation Error
+        public void run(){
+          int k;
+          boolean flag = true;
+          if (flag)
+          k = 20;
+          if (!flag)
+          k = 21;
+          System.out.println("isPrime("+k+")");
+        } // method run
+       //ExplicitlyInitialized3 -> Compilation Successful (if-else is treated as a unit)
+         public void run() {
+           int k;
+           boolean flag = true;
+           if (flag){
+             k = 20;
+           }else{
+             k = 21;
+           }
+           System.out.println("isPrime("+k+")");
+         }
+
+      -> The scope of an identifier is the region of a program to which that identifier’s declaration applies.
+      To see how it is possible to declare the same identifier more than once in a class, we need to define what a
+      “block” is. A block is an enclosed sequence of declarations and/or statements enclosed in curly braces { }.
+       //Scope -> In this sample there is no ambiguity
+        public class Scope{
+          boolean t = true;
+          int x = 99;
+          double sample = 8.1;
+
+          public void sample (double x){
+            double y = 5;
+            x = 5.3;
+            for (int t = 0; t < 3; t++){
+              int i = t + 4;
+              System.out.println (i + t + x);
+            } // end of int t’s scope; end of i’s scope
+
+            for (int t = 0; t < 7; t++)
+              x = t; // end of the scope of this version of int t
+          } // method sample; end of double x’s scope; end of y’s scope
+
+          public void original(){
+            System.out.println (t + " " + x + " " + sample);
+          } // method original
+        }

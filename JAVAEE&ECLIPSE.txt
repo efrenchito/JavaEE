@@ -1,9 +1,23 @@
 Java EE Development with Eclipse (2nd Edition)
+@0.Overview
+  2.Creating a Simple JEE Web Application
+    2.1 JSP
+      <%@ page language="java" contentType="text/html; charset=ISO-8859-1" encoding="ISO-8859-1" %>
+      <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+      <html>
+        <head>
+          <meta http-equiv="Convent-Type" content="text/html; charset=ISO-8859-1" />
+          <title>Login</title>
+        </head>
+        <body>
+          
+        </body>
+      </html>
 @1.Introducing JEE & Eclipse
   Java Enterprise Edition (JEE)
    JEE is a collection of many different specifications intended to perform specific tasks.
    JEE specifications can be broadly classified in the following groups:
-    PRESENTATION LAYER: 
+    PRESENTATION LAYER
      JEE specifications or technologies in this group receive the request from web server and send back the response HTML/JSON/XML.
      -> Servlets, JSP, JSF
     BUSINESS LAYER: 
@@ -138,8 +152,8 @@ Java EE Development with Eclipse (2nd Edition)
             </html>
       3.Add Server Libraries
        To solve 'The superclass "javax.servlet.http.HttpServlet" was not found on the Java Build Path'
-       Right-click on Project 'LoginSampleWebApp'>Properties>Java Build Path>Libraries
-        Add Server Runtime/Apache Tomcat v9.0
+       Right-click on Project 'LoginSampleWebApp'>Properties>Java Build Path
+        Add Library>Server Runtime/Apache Tomcat v9.0
   Running JSP in Tomcat
     To run this page in a web browser, you will need to deploy the application in a Servlet container.
     Make sure that Tomcat is running by checking its status in the Servers view of Eclipse.
@@ -184,7 +198,7 @@ Java EE Development with Eclipse (2nd Edition)
           <body>
           <%String errMsg = null; %>
           <%if ("POST".equalsIgnoreCase(request.getMethod()) && request.getParameter("submit") != null) {%>
-              <jsp:useBean id="loginBean" class="org.javaskills.beans.LoginBean">
+            <jsp:useBean id="loginBean" class="org.javaskills.beans.LoginBean">
               <jsp:setProperty name="loginBean" property="*"/>
             </jsp:useBean>
           <%
