@@ -1,0 +1,1864 @@
+ Java EE Development with Eclipse (2nd Edition)
+https://crunchify.com/ever-wondered-difference-between-dynamic-web-module-3-0-and-3-1-how-to-setup-3-1-correct-way-in-eclipse/
+
+@1.Introducing JEE & Eclipse
+  Java Enterprise Edition (JEE)
+   JEE is a collection of many different specifications intended to perform specific tasks.
+   JEE specifications can be broadly classified in the following groups:
+    PRESENTATION LAYER
+     JEE specifications or technologies in this group receive the request from web server and send back the response HTML/JSON/XML.
+     -> Servlets, JSP, JSF
+    BUSINESS LAYER: 
+     Handle the business logic of your application generally the request to this layer comes from 
+     the Presentation Layer/Middle Layer (Web Services). 
+     Classes in this layer are executed in application containers (GlassFish/WebSphere/Tomcat)
+      ENTERPRISE JAVA BEANS: Are Java classes where you can write your business logic.
+       EJB are not strict required but they provide many of the services that are essential 
+       (security/transaction mgmt, component lookup, object pooling)
+        -> Session Beans:
+        -> Message Driven Beans: Java Messaging Service (JSM)
+    ENTERPRISE INTEGRATION LAYER
+      APIS in this layer are used for interacting with external (to JEE application) systems in Enterprise.
+      Java Database Connectivity (JDBC)
+      The Java Persistence API (JPA)
+      Java Connector Architecture
+      Web Services  SOAP/REST 
+  Eclipse IDE
+   (source control system/build tools/file explorer/managing servers/database explorer/memory|cpu profiler)
+   Along with editor support, Eclipse has plugins to interact with many of the external
+   systems used during development. For example, source control systems such as SVN and
+   Git, build tools such as Apache Ant and Maven, file explorer for remote systems using
+   FTP, managing servers such as Tomcat and GlassFish, database explorer, memory and
+   CPU profiler, and so on.  
+   -> Workspace/Plugins/Editors and Views/Perspectives/Eclipse Preferences  
+  Tomcat -> Don't Support EJB
+   Tomcat is a Web Container. It supports APIs in the presentation layer, it also supports JDBC and JPA also. 
+   Check your have only one localhost in your host file -> 127.0.0.1   localhost
+   Configuration
+     Server shutdown Port: 8005
+     HTTP/1.1 Connector Port: 8081
+     AJP/1.3 Connector Port: 8009
+     Windows Service Name: Tomcat9
+     Tomcat Administration Login: admin/admin
+  GlassFish
+   GlassFish comes in two flavors: Web Profile and Full Platform. 
+   Web Profile is like Tomcat, which does not include EJB support. So download Full Platform
+   %GLASSFISH_HOME%: 'C:\Program Files\glassfish-4.1.1\'
+    -> Define ports: glassfish/domains/domain1/config/domain.xml
+    -> Start server: glassfish/bin/glassfish/bin/startserv.bat
+       index.html -> glassfish/domains/domain1/docroot/index.html
+       => Go to Administration Console
+  MySql
+    Installing MySQL for Windows
+      1.Accept License Agreement
+      2.Select the Custom option and click on Next.
+        Select... 
+          MySQL Server 
+          MySQL Workbench 
+        ...and complete the installation.
+      3.MySQL Server Configuration
+          Config Type: Development Machine
+          Connectivity: 
+            TCP/IP  
+            Port Number: 3306 
+            [CHECK] Open Firewall port for network access
+          Account and Roles: 
+            MySQL Root Password: root
+            Custom User: admin/admin
+         -> Make sure you select All Hosts when adding a user so that you are able to access
+            MySQL database from any remote machine that has network access to the machine
+            where MySQL is installed.
+    Creating MySQL users
+     You can create MySQL user either by the Command Prompt or by using MySQL Workbench.
+      Command Prompt:
+        mysql -u root -p 
+        Entered password: <root_password>
+        mysql>
+        mysql>user mysql;
+          Database changed
+        mysql>insert into user (host, user, password, select_priv, insert_priv, update_priv)
+                          values ('%', 'user1', password('usper1_pass'),'Y','Y','Y');
+      MySQL Workbench
+        connect to the local MySQL server
+        click on Management> Users & Privileges
+
+@2.Creating a Simple JEE Web Application
+  Configuring Tomcat in Eclipse
+    Double-click the server in the Servers view to open it in the editor. (Windows>Show View>Servers)
+    1.Add Tomcat v9.0 at Localhost Server (righ-click>New>Server)
+    2.Define Server location in order to enable localhost execution within Eclipse
+      opt1: Double-click Tomcat server node under Server tab to display Tomcat Server Overview
+            Under Server locations region, select 'Use Tomcat installation (takes control of Tomcat installation)'
+      opt2: right-click Tomcat server node -> Properties
+            General>Location: /Servers/Tomcat v9.0 Server at localhost.server
+  Creating a Dynamic Web Project
+    We will start with a project to create a simple JSP.
+    We will create a login JSP that submits data to it and validates the user.
+      1.Create Dynamic Web Project
+       File> New> Other 'Dynamic Web Project'
+       Project Name: LoginSampleWebApp
+       Target Runtime: Apache Tomcat v9.0
+       Dynamic web module version: 3.1
+      2.Create JSP File
+       Right-click on the WebContent folder, New> JSP File
+       Parent Folder: LoginSampleWebApp/WebContent
+       File Name: Login.jsp
+       If the file is not opened in the split editor:
+       -> Right-click on index.jsp in the Project Explorer and select Open With | Web Page Editor.
+          //Login.jsp
+           <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
+            <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+            <html>
+            <head>
+            <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+            <title>Login</title>
+            </head>
+            <body>
+            <%
+            String errMsg = null;
+            //first check whether the form was submitted
+            if ("POST".equalsIgnoreCase(request.getMethod()) && request.getParameter("submit") != null){
+                //form was submitted
+              String userName = request.getParameter("userName");
+              String password = request.getParameter("password");
+              if ("admin".equalsIgnoreCase(userName) && "admin".equalsIgnoreCase(password)){
+                //valid user
+                System.out.println("Welcome admin !");
+              }else{
+                //invalid user. Set error message
+                errMsg = "Invalid user id or password. Please try again";
+              }
+            }
+            %>
+            <h2>Login:</h2>
+            <!-- Check error message. If it is set, then display it -->
+            <%if (errMsg != null) { %>
+              <span style="color: red;"><%= errMsg %></span>
+            <%} %>
+              <form method="post">
+                User Name:<input type="text" name="userName"/><br/>
+                Password:<input type="password" name="password"/></br>
+                <button type="submit" name="submit">Submit</button>
+                <button type="reset">Reset</button>
+                 
+              </form>
+            </body>
+            </html>
+      3.Add Server Libraries
+       To solve 'The superclass "javax.servlet.http.HttpServlet" was not found on the Java Build Path'
+       Right-click on Project 'LoginSampleWebApp'>Properties>Java Build Path
+        Add Library>Server Runtime/Apache Tomcat v9.0
+  Running JSP in Tomcat
+    To run this page in a web browser, you will need to deploy the application in a Servlet container.
+    Make sure that Tomcat is running by checking its status in the Servers view of Eclipse.
+    There are two ways to add a project to a configured server so that the application can be run on this server:
+      1.Right-click on the server in the Servers view and select the Add and Remove option.
+      2.Right-click on the project in the Project Explorer and select Properties. 
+        Click on Server in the list, and select the server on which you want to deploy this project. Click OK or Apply.
+    In the first method the project is immediately deployed on the server.
+    In the second method, it will be deployed only when you run the project on the server.
+
+    To run the application, right-click on the project in Project Explorer and select Run As | Run on Server.
+    According to the Deployment Descriptor the welcome file should be displayed, so ensure your Login.jsp file 
+    is in the welcome list.
+  Using JavaBeans in JSP
+    The code that we wrote in JSP above does not follow JSP best practices.
+    You can delegate the processing of the business logic to JavaBeans from JSP. 
+    JavaBeans are simple Java objects with attributes and getters and setters for these objects.
+
+    JSP has a special tag for using JavaBeans – jsp:useBean:
+     -> <jsp:useBean id="name_of_variable" class="name_of_bean_class" scope="scope_of_bean"/>
+    We used the <jsp:setProperty> tag to set the attributes of the bean:
+        IMPLICITLY
+          When Bean members are named as the fields in the form.
+          -> <jsp:setProperty name="loginBean" property="*"/> 
+        EXPLICITLY
+          When member names of JavaBean do not match the request parameters.
+          -> <jsp:setProperty name="loginBean" property="userName" value="<%=request.getParameter(\"userName\")%>"/>
+          -> <jsp:setProperty name="loginBean" property="password" value="<%=request.getParameter(\"password\")%>"/>   
+
+     File> New> Class
+      Source Folder: LoginSampleWebApp/src
+      Package: package org.javaskills.beans
+      Class Name: LoginBean
+        //Login.jsp
+          <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
+          <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+          <html>
+          <head>
+          <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+          <title>Login</title>
+          </head>
+          <body>
+          <%String errMsg = null; %>
+          <%if ("POST".equalsIgnoreCase(request.getMethod()) && request.getParameter("submit") != null) {%>
+            <jsp:useBean id="loginBean" class="org.javaskills.beans.LoginBean">
+              <jsp:setProperty name="loginBean" property="*"/>
+            </jsp:useBean>
+          <%
+            if (loginBean.isValidUser()) {
+              //valid user
+              out.println("<h2>Welcome admin !</h2>");
+              out.println("You are successfully logged in <br/><br/>");
+            }else{
+              errMsg = "Invalid user id or password. Please try again";
+            }
+          %>
+          <%} %>
+          <!-- Check error message. If it's set then display it. -->
+          <% if(errMsg != null) { %>
+          <span style="color:red"><%= errMsg %></span>
+          <% } %> 
+            <form method="post">
+              User Name:<input type="text" name="userName"/><br/>
+              Password:<input type="password" name="password"/><br/>
+              <button type="submit" name="submit">Submit</button>
+              <button type="reset">Reset</button>
+               
+            </form>
+          </body>
+          </html>
+        //LoginBean.java
+          package org.javaskills.beans;
+
+          public class LoginBean {
+            private String userName;
+            private String password;
+            public String getUserName() {
+              return userName;
+            }
+            public void setUserName(String userName) {
+              this.userName = userName;
+            }
+            public String getPassword() {
+              return password;
+            }
+            public void setPassword(String password) {
+              this.password = password;
+            }
+            
+            public boolean isValidUser()
+            {
+                return "admin".equals(this.userName) && "admin".equals(this.password);
+            }
+
+          }
+  Using JSTL
+    JSTL tags can be used to replace much of the Java code written in scriplets. JSTL tags are classified in five broad groups:
+      Core: Covers flow control and variable support among other things
+      XML: Tags to process an XML document
+      i18n: Tags to support internationalization
+      SQL: Tags to access a database
+      Functions: Tags to perform some of the common string operations
+    -> We will modify the login JSP to use JSTL so that there are no Java scriplets in it.
+      1. Download JSTL libraries (API/Implementation), and make sure that these files are copied to WEB-INF/lib. 
+        *** All .jar files in this folder are added to the classpath of the web application.
+        -> http://search.maven.org/remotecontent?filepath=javax/servlet/jsp/jstl/javax.servlet.jsp.jstl-api/1.2.1/javax.servlet.jsp.jstl-api-1.2.1.jar
+        -> http://search.maven.org/remotecontent?filepath=org/glassfish/web/javax.servlet.jsp.jstl/1.2.1/javax.servlet.jsp.jstl-1.2.1.jar
+        => Right-click [Project]>WebContent>WEB-INF>lib
+            Import>General>File System Browse for jstl-api.1.2.2.jar & jstl-1.2.1.jar
+      2. Add a declaration for JSTL in our JSP.
+        <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+        Según el TLD o la directiva attribute del archivo tag, el atributo value no acepta expresiones] con causa raíz
+      3. Complete source code
+        //indexJSTL.jsp
+          <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" %>
+          <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+          <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+          <html>
+            <head>
+              <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+              <title>Login JSTL</title>
+            </head>
+            <c:set var="errMsg" value="${null}" />
+            <c:set var="displayForm" value="${true}" />
+            <c:if test="${\"POST\".equalsIgnoreCase(pageContext.request.method) 
+               && pageContext.request.getParameter(\"submit\") != null }">
+              <jsp:useBean id="loginBean" class="org.javaskills.beans.LoginBean">
+                <jsp:setProperty name="loginBean" property="userName" value="<%= request.getParameter(\"userName\") %>" />
+                <jsp:setProperty name="loginBean" property="password" value="<%= request.getParameter(\"password\") %>" />
+              </jsp:useBean>
+              <c:choose>
+                <c:when test="${!loginBean.isValidUser()}">
+                  <c:set var="errMsg" value="Invalid user name of password. Please try again" />
+                </c:when>
+                <c:otherwise>
+                 <h2><c:out value="Welcome admin !"/></h2>
+                 <c:out value="You are successfully logged in" />
+                 <c:set var="displayForm" value="${false}" />
+                </c:otherwise>
+              </c:choose>
+            </c:if>
+            <c:if test="${errMsg != null}">
+              <span style="color:red"><c:out value="${errMsg}"></c:out></span>
+            </c:if>
+            <c:if test="${displayForm}">
+            <body>
+              <h2>Login JSTL</h2>
+              <form method="post">
+              User Name:<input type="text" name="userName" /><br />
+              Password:<input type="password" name="password" /><br />
+              <button type="submit" name="submit">Submit</button>
+              <button type="reset">Reset</button>
+            </form>
+            </body>
+            </c:if>
+          </html>
+  Using Java Servlet
+    //LoginServlet.java
+      package org.javaskills.servlet;
+
+      import javax.servlet.annotation.WebServlet;
+      import javax.servlet.http.HttpServlet;
+      import javax.servlet.http.HttpServletRequest;
+      import javax.servlet.http.HttpServletResponse;
+      import javax.servlet.ServletException;
+      import java.io.IOException;
+
+      /**
+       * Servlet implementation class LoginServlet
+       */
+      @WebServlet("/login")
+      public class LoginServlet extends HttpServlet {
+        private static final long serialVersionUID = 1L;
+             
+          /**
+           * @see HttpServlet#HttpServlet()
+           */
+          public LoginServlet() {
+              super();
+              // TODO Auto-generated constructor stub
+          }
+
+        /**
+         * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+         */
+        protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+          // TODO Auto-generated method stub
+          response.getWriter().write(createForm(null));
+        }
+
+        /**
+         * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+         */
+        protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+          String userName = request.getParameter("userName");
+          String password = request.getParameter("password");
+          
+          StringBuilder responseStr = new StringBuilder();
+          if(userName.equalsIgnoreCase("admin") && password.equalsIgnoreCase("admin")) {
+            responseStr.append("<h2>Welcome admin!!</h2>")
+                       .append("You're successfully logged in");
+          }else {
+            //invalid user credentials
+            responseStr.append(createForm("Invalid user id or password. Please try again!!"));
+          }
+          
+          response.getWriter().write(responseStr.toString());
+          
+        }
+        
+        protected String createForm(String errMsg) {
+          StringBuilder sb = new StringBuilder("<h2>Login</h2>");
+          if(errMsg != null) {
+            sb.append("<span style='color:red;'>");
+              sb.append(errMsg);
+              sb.append("</span>");
+          }
+          sb.append("<form method='post'>");
+          sb.append("User Name:<input type='text' name='userName' /><br />");
+          sb.append("Password:<input type='text' name='password' /><br /><br />");
+          sb.append("<button type='submit' name='submit'>Submit</button>");
+            sb.append("<button type='reset'>Reset</button><br />");
+          sb.append("</form>");
+          
+          return sb.toString();
+        }
+
+      }
+    As you can see, it is not very convenient to write HTML markup in Servlet. Therefore, if
+    you are creating a page with a lot of HTML markup, then it is better to use JSP or plain
+    HTML. Servlets are good to process requests that do not need to generate too much
+    markup, for example, controllers in the Model-View-Controller (MVC) framework; for
+    processing requests that generate a non-text response; or for creating a web service or
+    web-socket end points.
+  Creating WAR
+    Thus far, we have been running our web application from Eclipse, which does all the work of deploying the application to the 
+    Tomcat server. This works fine during development,
+    but when you want to deploy it to the test or the production server, you need to create
+    Web Application Archive (WAR).
+    -> To deploy the WAR file to Tomcat, copy it to the <tomcat_home>/webapps folder.
+    Tomcat monitors the webapps folder, and any WAR file copied to it is automatically deployed. You can verify this by opening 
+    the URL of your application in the browser, for example, http://localhost:8080/LoginServletApp/login.
+  Java Server Faces
+    When working with JSP, we saw that it is not a good idea to mix scriplets with the HTML markup. We solved this problem by 
+    using JavaBean. Java Server Faces takes this design further, and in addition to supporting JavaBeans, it provides built-in 
+    tags for HTML user controls, which are context aware, can perform validation, and can preserve the state between requests. We 
+    will now create the login application using JSF.
+    -> JSF follows the MVC pattern. 
+     The advantage of MVC is that there is a clear separation of the UI and the business logic (which requires a different set 
+     of expertise) so that they can be developed independently to a large extent. In JSP, the implementation of MVC is optional, 
+     but JSF enforces the MVC design.
+     -> Views in JSF are created as xhtml files. The controller is a servlet from the JSF library, and the models are JavaBeans.
+
+    1. Create Dynamic Web Project
+       File> New> Other 'Dynamic Web Project'
+       Project Name: LoginJSFApp
+       Target Runtime: Apache Tomcat v9.0
+       Dynamic web module version: 3.1
+        -> Generate web.xml deployment descriptor
+    2. Download JSF libraries 
+        https://maven.java.net/content/repositories/releases/org/glassfish/javax.faces/2.2.9/javax.faces-2.2.9.jar
+       and copy to the WEB-INF/lib folder in your project.
+    3. Add the servlet/servlet-mapping
+      You can specify any name as servlet-name; just make sure that you use the same name in servlet-mapping.
+      The class for the servlet is javax.faces.webapp.FacesServlet, the JAR file we've downloaded and copied to WEB-INF/lib.
+      Add the following XML snippet before </web-app>:
+        //web.xml
+          <servlet>
+            <servlet-name>JSFServlet</servlet-name>
+            <servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
+            <load-on-startup>1</load-on-startup>
+          </servlet>
+          <servlet-mapping>
+            <servlet-name>JSFServlet</servlet-name>
+            <url-pattern>*.xhtml</url-pattern>
+          </servlet-mapping>
+    4. Create Managed Bean
+      Right-click on the src folder under Java Resources
+      Select the New | Class menu option.
+      Create JavaBean, LoginBean, as described in the Using JavaBeans in JSP section.
+      Create two members for userName and password.
+      Create the getters and setters for them. Then, add two annotations as follows:
+      //LoginBean.java
+        import javax.faces.bean.ManagedBean;
+        import javax.faces.bean.RequestScoped;
+        @ManagedBean(name="loginBean")
+        @RequestScoped
+        public class LoginBean {
+          private String userName;
+          private String password;
+          public String getUserName() {
+          return userName;
+          }
+          public void setUserName(String userName) {
+          this.userName = userName;
+          }
+          public String getPassword() {
+          return password;
+          }
+          public void setPassword(String password) {
+          this.password = password;
+          }
+        }
+      //index.xhtml
+        <html 
+          xmlns="http://www.w3.org/1999/xhtml"
+          xmlns:f="http://java.sun.com/jsf/core"
+          xmlns:h="http://java.sun.com/jsf/html">
+          <head>
+            <title>Login</title>
+          </head>
+          <body>
+          </body>
+         </html> 
+      //welcome.xhtml
+        <html 
+          xmlns="http://www.w3.org/1999/xhtml"
+          xmlns:f="http://java.sun.com/jsf/core"
+          xmlns:h="http://java.sun.com/jsf/html">
+          <head>
+            <title>Welcome</title>
+          </head>
+          <body>
+          <h2>Welcome admin !</h2>
+          You are successfully logged in
+          </body>
+        </html>
+  Using Maven [Eclipse]
+    Show View 'Maven Repositories'
+      Window> Show View> Others -> 'Maven'
+      Maven Repositories
+      ...
+    Download Index Updates on Startup  
+      Window> Preferences 
+        -> 'Maven'> User Settings
+        -> 'Maven' [check] 'Download repository index updates on startup'
+    Create Maven Project
+      File> New 'Maven Project'
+        [check] Use default Workspace location  -> Next
+        Select artifactId: maven-archetype-webapp -> Next
+          Group Id: org.javaskills
+          Artifact Id: maven_jsf_webapp
+          Package: org.javaskills.maven_jsf_webapp -> Finish
+    Adding Dependencies
+      javax.servlet-api:3.1.0[provided]
+      jsf-api:2.2.9
+      jsf-impl:2.2.9
+    Project Structure
+      Copy the packt folder from the src folder of that project to the src/main/java folder of this Maven project. 
+      Then, copy web.xml from the WEB-INF folder to the src/main/webapp/WEB-INF folder of this project.
+      Copy index.xhtml and welcome.xhtml to the src/main/webapp folder.
+    Creating WAR using Maven
+      -> Right click run as Maven Build
+       The WAR file is created in the target folder. 
+       You can then deploy the WAR file in Tomcat by copying it to the webapps folder of Tomcat.
+
+@3.Source Control Management in Eclipse
+  Source Control Management (SCM) is an essential part of software development. 
+  By using SCM tools, you make sure that you have access to versions of your code at important milestones.
+  Eclipse has had support for integrating various SCM tools for a long time – this includes support for CVS, Microsoft Source 
+  Safe, Perforce, and Subversion (SVN). The recent versions of Eclipse have built in support for Git too.
+  For more information about Eclipse Git plugin, refer to -> https://wiki.eclipse.org/EGit/User_Guide.
+  -> The Eclipse Subversion plugin
+    Create SVN Repository
+      Access to https://riouxsvn.com/  and create a repository 
+      Repository title: 'SVN_D3m0'
+      User/password: efrenchito/###___mi
+      URL: https://svn.riouxsvn.com/svn_d3m0
+    Install plugin
+      Help> Eclipse Marketplace
+      Filter: Subversion
+       -> Install Subclipse/Subversive, then restart (Eclipse)
+    Download & Install JAVAHL -> https://sliksvn.com/download/  
+      Window> Preferences> SVN 
+       [select] SVN Interface: Client 'SVNKit (Pure Java) SVNKit v1.8.12.10533'
+    Open Subversion Repository Exploring
+      Window> Perspective> Open Perspective 'Subversion Repository Exploring'
+      SVN Repositorires> Add SVN Repository
+       -> Enter the URL of your SVN repository, your user name, and the password.
+    Create a New Project 
+      File> New> Java Project 'SVNTestProject' -> Finish
+      Right Click: New> Class
+        Package: org.javaskills
+        Name: HelloWorld
+          //HelloWorld.java
+            package org.javaskills;
+
+            public class HelloWorld {
+
+              public static void main(String[] args) {
+                System.out.println("Hello, World!!!");
+
+              }
+
+            }
+    Adding a Project to a SVN Repository
+      Share Project
+        [Project] Right click> Team> Share Project> SVN -> Next
+          Use existing repository -> Finish
+      Commit
+    ...
+  -> The Eclipse GIT plugin
+    Create GIT Repository
+      Access to https://gitlab.com/  and create a repository 
+      Project Name: 'GIT_D3m0'
+      Visibility Level: public
+      URL: https://gitlab.com/efrenchito/GIT_D3m0.git
+      User/password: efrenchito/###___miGitXXX
+    Install plugin
+      Help> Eclipse Marketplace
+      Filter: Subversion
+       -> Install EGit, then restart (Eclipse)
+    Adding a project to Git
+      Git is a distributed repository. Unlike other source management systems, Git maintains a
+      complete local repository too. So you can perform activities such as check-out and checkin
+      in the local repository without connecting to any remote repository. When you are ready
+      to move your code to a remote repository, then you can connect to it and push your files to
+      the remote repository.
+    Create a New Project 
+      File> New> Java Project 'GITTestProject' -> Finish
+      Right Click: New> Class
+        Package: org.javaskills
+        Name: HelloWorld
+          //HelloWorld.java
+            package org.javaskills;
+
+            public class HelloWorld {
+
+              public static void main(String[] args) {
+                System.out.println("Hello, World!!!");
+
+              }
+
+            }
+    Adding a Project to a GIT Repository
+      Share Project
+        [Project] Right click> Team> Share Project> GIT -> Next
+      Configure GIT Repository
+        Repository: GIT - C:\Users\N3rF3\GIT  
+        -> Finish
+        ...
+      Open Git Repositories/Staging/History (view)
+        Window> Show View> Other 'Git' -> Git Repositories
+        Window> Show View> Other 'Git' -> Git Staging
+        Right Click> Team> Show in History
+    GIT cycle
+      GIT Working Directory
+        [Project folder -> Staging Area -> Local repository -> Remote repository]
+        project folder   -> git add     -> staging Area
+        staging area     -> git commit  -> local repository
+        local repository -> git push    -> remote repository
+    Viewing a file difference after modifications
+      To see what changes have been made to the file since last commit, double-click on the file in the Git Staging view.
+      Another way is clicking on the file in Package Explorer and selecting Compare With | Head Revision
+    Creating a new branch
+      To create a new branch, go to the Git Repositories view and right-click on the branch node. 
+      Then select the Switch To | New Branch option.
+        Branch name: bug#1234
+        The [Checkout new branch] box option, actives the branch once its created.
+        Any changes you commit are going to be in this branch and the master branch remains unaffected.
+        -> clic on Finish
+      -> To Commit the preceding changes to the master branch
+        Go to the Git Repositories view and right-click on the 'master' branch, then select the Switch To | master
+        To merge changes from branch bug#1234 to the master branch, right click on the repository in the Git Repositories view 
+        and select Merge.
+        -> Click OK to complete the merge operation 
+      -> Delete branch bug#1234
+        We have merged all the changes from branch bug#1234 to the master and we no longer need it.
+        Go to the Git Repositories view and right-click on the 'bug#1234' branch, then select the 'Delete branch'
+    Committing a project to a remote repository
+      In the Git Repositories view, right-click on the Remotes node and select the Create Remote option.
+        Remote Name: Gitlab
+        URI: https://gitlab.com/efrenchito/GIT_D3m0.git
+        User: efrenchito
+        Password: ###___miGitXXX
+    Pulling changes from a remote repository...
+      In the Package Explorer, right-click on the project and select Team | Remote | Configure Fetch from Upstream.
+      ...
+    Cloning a Remote repository...
+@4.Creating a JEE Database Application
+  Overview
+    Most web applications today require access to a database. 
+    In this chapter, we will see two ways to access a database from JEE web applications.
+      .Using JDBC APIs
+        JDBC has been part of JDK since version 1.1. It provides uniform APIs to access different
+        relational databases. Between JDBC APIs and the database sits the JDBC driver for this
+        database (either provided by the vendor of the database or some third-party vendor).
+        JDBC translates the common API calls to database-specific calls. The results returned
+        from the database are also converted into objects of common data access classes.
+      .Using JPA APIs
+        JPA is the result of JSR 220. One of the problems of using JDBC APIs directly is converting object representation
+        of data to relation data. The process is reversed when handling data returned from the relational database. 
+        If there is a way to automatically map object-oriented representation of data in web applications to relational data, 
+        it would save a lot of developer time. This is also called Object-relational mapping (ORM).
+    The application that we are going to build is for student-course management. The goal is to take an example that can show 
+    how to model relationships between tables and use them in JEE applications. We will use MySQL for the database and Tomcat 
+    for the web application container.
+  Creating a database schema...
+    There are many ways of creating database tables and relationships in MySQL:
+      -> You can use Data Description Language (DDL) statements directly at MySQL Command Prompt from a console
+      -> You can use MySQL Workbench and create tables directly by using the user interface
+      -> You can create an entity-relationship diagram in MySQL Workbench, export it to create a DDL script, 
+         and then run this script to create tables and relationships
+    The third option is described in this section
+      1. [MySQL Workbench] File | New Model menu
+      2. Double-click the Add Diagram icon;
+      ...
+  The script for creating tables and relationships
+    The following is the DDL script to create tables and relationships for the course management example.
+    //SCRIPT
+      -- MySQL Script generated by MySQL Workbench—Sun Mar 8 18:17:07 2015—
+      -- Model: New Model Version: 1.0—MySQL Workbench Forward Engineering
+      SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+      SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+      SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
+      -- ------------------------—Schema course_management—--------------------
+      DROP SCHEMA IF EXISTS `course_management` ;
+      --  -----------------------—Schema course_management—--------------------
+      CREATE SCHEMA IF NOT EXISTS `course_management` DEFAULT CHARACTER SET utf8
+      COLLATE utf8_general_ci ;
+      USE `course_management` ;
+      -- ---------------------—Table `course_management`.`Teacher`—------------
+      DROP TABLE IF EXISTS `course_management`.`Teacher` ;
+      CREATE TABLE IF NOT EXISTS `course_management`.`Teacher` (
+      `id` INT NOT NULL AUTO_INCREMENT,
+      `first_name` VARCHAR(45) NOT NULL,
+      `last_name` VARCHAR(45) NULL,
+      `designation` VARCHAR(45) NOT NULL,
+      PRIMARY KEY (`id`))
+      ENGINE = InnoDB;
+      -- ----------------------Table `course_management`.`Course`—-------------
+      DROP TABLE IF EXISTS `course_management`.`Course` ;
+      CREATE TABLE IF NOT EXISTS `course_management`.`Course` (
+      `id` INT NOT NULL AUTO_INCREMENT,
+      `name` VARCHAR(45) NOT NULL,
+      `credits` INT NOT NULL,
+      `Teacher_id` INT NULL,
+      PRIMARY KEY (`id`),
+      INDEX `fk_Course_Teacher_idx` (`Teacher_id` ASC),
+      CONSTRAINT `fk_Course_Teacher`
+      FOREIGN KEY (`Teacher_id`)
+      REFERENCES `course_management`.`Teacher` (`id`)
+      ON DELETE NO ACTION
+      ON UPDATE NO ACTION)
+      ENGINE = InnoDB;
+      -- ---------------------—Table `course_management`.`Student`—------------
+      DROP TABLE IF EXISTS `course_management`.`Student` ;
+      CREATE TABLE IF NOT EXISTS `course_management`.`Student` (
+      `id` INT NOT NULL AUTO_INCREMENT,
+      `first_name` VARCHAR(45) NOT NULL,
+      `last_name` VARCHAR(45) NULL,
+      `enrolled_since` MEDIUMTEXT NOT NULL,
+      PRIMARY KEY (`id`))
+      ENGINE = InnoDB;
+      -- ----------------------Table `course_management`.`Course_Student`—------
+      DROP TABLE IF EXISTS `course_management`.`Course_Student` ;
+      CREATE TABLE IF NOT EXISTS `course_management`.`Course_Student` (
+      `Course_id` INT NOT NULL,
+      `Student_id` INT NOT NULL,
+      PRIMARY KEY (`Course_id`, `Student_id`),
+      INDEX `fk_Course_has_Student_Student1_idx` (`Student_id` ASC),
+      INDEX `fk_Course_has_Student_Course1_idx` (`Course_id` ASC),
+      CONSTRAINT `fk_Course_has_Student_Course1`
+      FOREIGN KEY (`Course_id`)
+      REFERENCES `course_management`.`Course` (`id`)
+      ON DELETE NO ACTION
+      ON UPDATE NO ACTION,
+      CONSTRAINT `fk_Course_has_Student_Student1`
+      FOREIGN KEY (`Student_id`)
+      REFERENCES `course_management`.`Student` (`id`)
+      ON DELETE NO ACTION
+      ON UPDATE NO ACTION)
+      ENGINE = InnoDB;
+
+      SET SQL_MODE=@OLD_SQL_MODE;
+      SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+      SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+  Creating tables in MySQL
+    [MySQL Workbench]
+     0. Reconnect to DBMS
+     1. Create a new query tab (the first button in the toolbar) and paste the preceding script.
+     2. Execute the query.
+     3. At the end of the execution, refresh the schemas in the left pane. 
+        You should see the course_management schema and the tables created in it. 
+  Creating a database application using JDBC
+    Creating a project and setting up Maven dependencies
+      [Eclipse] File> New> Maven Project
+        [check] Create a simple project (skyp archetype selection) 
+        [check] Use default workspace location -> Next
+      Artifact
+        groupId: org.javaskills
+        artifactId: CourseManagementJDBC
+        version: 0.0.1-SNAPSHOT
+        packaging: war
+      //pom.xml
+        <project xmlns="http://maven.apache.org/POM/4.0.0"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+          <modelVersion>4.0.0</modelVersion>
+          <groupId>packt.book.jee.eclipse</groupId>
+          <artifactId>CourseManagementJDBC</artifactId>
+          <version>1</version>
+          <packaging>war</packaging>
+          <dependencies>
+            <dependency>
+              <groupId>javax.servlet</groupId>
+              <artifactId>javax.servlet-api</artifactId>
+              <version>3.1.0</version>
+              <scope>provided</scope>
+            </dependency>
+            <dependency>
+              <groupId>javax.servlet.jsp</groupId>
+              <artifactId>jsp-api</artifactId>
+              <version>2.2</version>
+              <scope>provided</scope>
+            </dependency>
+            <dependency>
+              <groupId>javax.servlet</groupId>
+              <artifactId>jstl</artifactId>
+              <version>1.2</version>
+            </dependency>
+            <dependency>
+              <groupId>mysql</groupId>
+              <artifactId>mysql-connector-java</artifactId>
+              <version>5.1.34</version>
+            </dependency>
+          </dependencies>
+        </project>
+    Update web.xml to 3.1 
+      //web.xml
+        <?xml version="1.0" encoding="UTF-8"?>
+        <web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" id="WebApp_ID" version="3.1">
+          <display-name>LoginSampleWebApp</display-name>
+          <welcome-file-list>
+            <welcome-file>index.jsp</welcome-file>
+          </welcome-file-list>
+        </web-app>
+    Add jstl libraries
+      1. Download JSTL libraries (API/Implementation), and make sure that these files are copied to WEB-INF/lib. 
+        *** All .jar files in this folder are added to the classpath of the web application.
+        -> http://search.maven.org/remotecontent?filepath=javax/servlet/jsp/jstl/javax.servlet.jsp.jstl-api/1.2.1/javax.servlet.jsp.jstl-api-1.2.1.jar
+        -> http://search.maven.org/remotecontent?filepath=org/glassfish/web/javax.servlet.jsp.jstl/1.2.1/javax.servlet.jsp.jstl-1.2.1.jar
+        => Right-click [Project]>WebContent>WEB-INF>lib
+            Import>General>File System Browse for jstl-api.1.2.2.jar & jstl-1.2.1.jar
+      2. Add a declaration for JSTL in your JSP.
+        <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>  
+    Creating Java Beans for data storage
+      //Course.java
+        package org.javaskills.bean;
+
+        public class Course {
+          private int id;
+          private String name;
+          private int credits;
+
+          public int getId() {
+            return id;
+          }
+          public void setId(int id) {
+            this.id = id;
+          }
+
+          public String getName() {
+            return name;
+          }
+          public void setName(String name) {
+            this.name = name;
+          }
+
+          public int getCredits() {
+            return credits;
+          }
+          public void setCredits(int credits) {
+            this.credits = credits;
+          }
+
+          public boolean isValidCourse() {
+            return name != null && credits != 0;
+          }
+        }
+      //Person.java
+        package org.javaskills.bean;
+
+        public class Person{
+          private int id;
+          private String firstName;
+          private String lastName;
+
+          public int getId() {
+            return id;
+          }
+          public void setId(int id) {
+            this.id = id;
+          }
+
+          public String getFirstName() {
+            return firstName;
+          }
+          public void setFirstName(String firstName) {
+            this.firstName = firstName;
+          }
+
+          public String getLastName(){
+            return lastName;
+          }
+          public void setLastName(String lastName){
+            this.lastName = lastName;
+          }
+        }
+      //Student.java 
+        package org.javaskills.bean;
+
+        public class Student extends Person {
+          private long enrolledsince;
+
+          public long getEnrolledsince() {
+            return enrolledsince;
+          }
+          public void setEnrolledsince(long enrolledsince) {
+            this.enrolledsince = enrolledsince;
+          }
+          
+        }
+      //Teacher.java
+        package org.javaskills.bean;
+
+        public class Teacher extends Person{
+          private String designation;
+
+          public String getDesignation(){
+            return designation;
+          }
+          public void setDesignation(String designation){ 
+            this.designation = designation;
+          }
+        } 
+    Creating JSP to add a course
+      //addCourse.jsp
+        <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
+        <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+        <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+        <html>
+        <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+        <title>Add Course</title>
+        </head>
+        <body>
+           <c:set var="errMsg" value="${null}" />
+           <c:set var="displayForm" value="${true}" />
+           <c:if test="${\"POST\".equalsIgnoreCase(pageContext.request.method) && pageContext.request.getParameter(\"submit\") != null}">
+             <jsp:useBean id="courseBean" class="org.javaskills.bean.Course">
+               <c:catch var="beanStorageException">
+                 <jsp:setProperty name="courseBean" property="*" />
+               </c:catch>
+             </jsp:useBean>
+             <c:choose>
+               <c:when test="${!courseBean.isValid() || beanStorageException != null}">
+                 <c:set var="errMsg" value="Invalid course details. Please try again" />
+               </c:when>
+               <c:otherwise>
+                 <c:redirect url="listCourse.jsp" />
+               </c:otherwise>
+             </c:choose>
+           </c:if>
+
+           <h2>Add Course:</h2>
+           <c:if test="${errMsg != null}">
+             <span style="color:red"><c:out value="${errMsg}" /></span>
+           </c:if>
+           <form method="post">
+             Name: <input type="text" name="name" /><br />
+             Credits: <input type="text" name="credits"><br />
+             <button type="submit" name="submit">Add</button>
+           </form>
+          </body>
+        </html>
+      //listCourse.jsp
+        <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" %>
+        <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+        <html>
+          <head>
+            <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+            <title>List Courses</title>
+          </head>
+          <body>
+            <h2>Courses: </h2>
+          </body>
+        </html>
+    JDBC concepts
+      -> https://docs.oracle.com/javase/tutorial/jdbc/basics/gettingstarted.html
+      Classes/Interfaces in JDBC
+        Before performing any operations in JDBC, we need to establish a connection to the database. 
+        Here are some of the important classes/interfaces in JDBC for executing SQL statements:
+
+        ***************   http://docs.oracle.com/javase/8/docs/api/java/sql/package-frame.html   ***************
+        java.sql.Connection        -> Represents the connection between the application and the backend database
+        java.sql.DriverManager     -> Manages JDBC drivers used in the application
+                                      Use the DriverManager.getConnection static method to obtain the connection
+        java.sql.Statement         -> Used for executing static SQL statements
+        java.sql.PreparedStatement -> Used for preparing parameterized SQL statements
+                                      SQL statements are pre-compiled and can be executed with different parameters repeatedly
+        java.sql.CallableStatement -> Used for executing a stored procedure
+        java.sql.ResultSet         -> Represents a row in the database table in the result returned after the execution
+                                      of an SQL query by Statement or PreapredStatement
+      Creating a database connection
+        1. Specify to the DriverManager which JDBC drivers to try to make Connections with.
+           The easiest way to do this is to use Class.forName() on the class that implements the java.sql.Driver interface.
+           With MySQL Connector/J, the name of this class is com.mysql.jdbc.Driver.
+           -> See http://dev.mysql.com/doc/connector-j/en/connector-j-usagenotes-connectdrivermanager.html
+
+            try {
+              Class.forName("com.mysql.jdbc.Driver").newInstance(); 
+              // The newInstance() call is a work around for some broken Java implementations
+
+            } catch (ClassNotFoundException e) {
+              //log excetion
+              //either throw application specific exception or return
+              return;
+            }
+        2. Then, get the connection by calling DriverManager.getConnection() method.
+           The argument to DriverManager.getConnection is called a connection URL or string.
+           -> See http://dev.mysql.com/doc/connector-j/en/connector-j-reference-configurationproperties.html
+
+            try {
+              Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/schema_name?" +
+                                                           "user=your_user_name&password=your_password");
+              //perform DB operations and then close the connection
+              con.close();
+            } catch (SQLException e) {
+              //handle exception
+              System.out.println("SQLException: " + ex.getMessage());
+              System.out.println("SQLState: " + ex.getSQLState());
+              System.out.println("VendorError: " + ex.getErrorCode());
+            }
+      Executing SQL statements
+        Use Statement for executing static SQL (having no parameters) and PreparedStatement for executing parameterized statements 
+        To avoid the risk of SQL Injection, refer to: 
+         -> http://en.wikipedia.org/wiki/SQL_injection
+         -> https://www.owasp.org/index.php/SQL_injection
+        //Statement.executeQuery
+          // assume that conn is an already created JDBC connection (see previous examples)
+          Statement stmt = null;
+          ResultSet rs = null;
+          try {
+            stmt = con.createStatement();
+            rs = stmt.executeQuery("select * from Course");
+            //if (stmt.execute("SELECT foo FROM bar")) { rs = stmt.getResultSet(); }
+
+            //Now do something with the result
+            List<Course> courses = new ArrayList<Course>();
+            //Depending on the database that you connect to, you may have to
+            //call rs.first() before calling rs.next(). In the case of a MySQL
+            //database, it is not necessary to call rs.first()
+            while (rs.next()) {
+              Course course = new Course();
+              course.setId(rs.getInt("id"));
+              course.setName(rs.getString("name"));
+              course.setCredits(rs.getInt("credits"));
+              courses.add(course);
+            }
+          } catch (
+            SQLException e) {
+            //handle exception
+            e.printStackTrace();
+          } finally {
+            if (rs != null) {
+                try {
+                    rs.close();
+                } catch (SQLException sqlEx) { } // ignore
+
+                rs = null;
+            }
+            if (stmt != null) {
+                try {
+                    stmt.close();
+                } catch (SQLException sqlEx) { } // ignore
+
+                stmt = null;
+            }
+          }
+        Use Connection.createStatement () to create an instance of Statement.
+        Statement.executeQuery returns ResultSet -> If the SQL statement is a query
+        Statement.execute (which returns true if the statement is executed successfully; else, false)  
+        //PreparedStatement
+          PreparedStatement stmt = null;
+          int courseId = 10;
+          ResultSet rs = null;
+          try {
+            stmt = con.prepareStatement("select * from Course where id = ?");
+            stmt.setInt(1, courseId);
+            rs = stmt.executeQuery();
+            Course course = null;
+            if (rs.next()) {
+              course = new Course();
+              course.setId(rs.getInt("id"));
+              course.setName(rs.getString("name"));
+              course.setCredits(rs.getInt("credits"));
+            }
+          } catch (SQLException e) {
+            //handle exception
+            e.printStackTrace();
+          } finally {
+            try {
+              if (rs != null)
+                rs.close();
+              if (stmt != null
+                stmt.close();
+            }
+            catch (SQLException e) {
+              //handle exception
+            }
+          }
+      Handling Transactions
+        If you want to perform multiple changes to the database as a single unit, that is, either all changes
+        should be done or none, then you need to start a transaction in JDBC.
+        You start a transaction by calling Connection. setAutoCommit(false). 
+        Once all operations are executed successfully, commit the changes to the database by calling Connection.commit. 
+        If for any reason you want to abort the transaction, call Connection.rollback().
+        //Transactions.java
+          PreparedStatement stmt = con.prepareStatement("insert into Course (id,name, credits) values (?,?,?)");
+          con.setAutoCommit(false);
+          try {
+            for (Course course : courses) {
+              stmt.setInt(1, course.getId());
+              stmt.setString(2, course.getName());
+              stmt.setInt(3, course.getCredits());
+              stmt.execute();
+            }
+            //commit the transaction now
+            con.commit();
+          } catch (SQLException e) {
+            //rollback commit
+            con.rollback();
+          }
+        -> http://docs.oracle.com/javase/tutorial/jdbc/basics/transactions.html
+      Using the JDBC database connection pool
+        As mentioned before, a JDBC database connection is an expensive operation and the connection object should be reused. 
+        Connection pools are used for this purpose. Most web containers provide their own implementation of a connection pool 
+        along with ways to configure it using JNDI.
+          -> https://tomcat.apache.org/tomcat-9.0-doc/jdbc-pool.html
+        Copy the mysql-connector-java-<version>.jar to TOMCAT_ROOT_DIR\lib folder.
+        Add the dependency of the Tomcat connection pool library to Maven's pom.xml
+          <dependency>
+            <groupId>org.apache.tomcat</groupId>
+            <artifactId>tomcat-jdbc</artifactId>
+            <version>9.0.6</version>
+          </dependency>
+        We also want to move the database properties out of the code.
+          src/main/resources/db.properties
+            db_host=localhost
+            db_port=3306
+            db_name=course_management
+            db_user_name=your_user_name
+            db_password=your_password
+            db_driver_class_name=com.mysql.jdbc.Driver
+        We will create a singleton class to create JDBC connections by using the Tomcat connection pool.
+          //DatabaseConnectionFactory
+            package org.javaskills.db.connection;
+  
+            import java.io.IOException;
+            import java.io.InputStream;
+            import java.sql.Connection;
+            import java.sql.SQLException;
+            import java.util.Properties;
+            import org.apache.tomcat.jdbc.pool.DataSource;
+            import org.apache.tomcat.jdbc.pool.PoolProperties;
+  
+            /**
+            * Singleton Factory class to create JDBC database connections
+            *
+            */
+            public class DatabaseConnectionFactory {
+              //singleton instance
+              private static DatabaseConnectionFactory conFactory = new
+              DatabaseConnectionFactory();
+              private DataSource dataSource = null;
+              
+              //Make the construction private
+              private DatabaseConnectionFactory() {}
+              //
+              /**
+              * Must be called before any other method in this class.
+              * Initializes the data source and saves it in an instance variable
+              *
+              * @throws IOException
+              */
+              public synchronized void init() throws IOException {
+                //Check if init was already called
+                if (dataSource != null)
+                  return;
+                
+                //load db.properties file first
+                InputStream inStream = this.getClass().getClassLoader().getResourceAsStream("db.properties");
+                Properties dbProperties = new Properties();
+                dbProperties.load(inStream);
+                inStream.close();
+                
+                //create Tomcat specific pool properties
+                PoolProperties p = new PoolProperties();
+                p.setUrl("jdbc:mysql://" + dbProperties.getProperty("db_host") +
+                         ":" + dbProperties.getProperty("db_port") + "/" +
+                         dbProperties.getProperty("db_name"));
+                p.setDriverClassName(dbProperties.getProperty("db_driver_class_name"));
+                p.setUsername(dbProperties.getProperty("db_user_name"));
+                p.setPassword(dbProperties.getProperty("db_password"));
+                p.setMaxActive(10);
+                dataSource = new DataSource();
+                dataSource.setPoolProperties(p);
+              }
+  
+              //Provides access to singleton instance
+              public static DatabaseConnectionFactory getConnectionFactory() {
+                return conFactory;
+              }
+  
+              //returns database connection object
+              public Connection getConnection () throws SQLException {
+                if (dataSource == null)
+                  throw new SQLException("Error initializing datasource");
+                return dataSource.getConnection();
+              }
+            }
+        We must call the init method of DatabaseConnectionFactory before getting a connection from it. 
+        We will create a servlet and load it on startup. Then, we will call DatabaseConnectionFactory.init 
+        from the init method of the servlet.
+          //InitServlet
+            package org.javaskills.servlet;
+
+            import javax.servlet.annotation.WebServlet;
+            import javax.servlet.http.HttpServlet;
+            import javax.servlet.ServletConfig;
+            import javax.servlet.ServletException;
+            import java.io.IOException;
+            import org.javaskills.db.connection.DatabaseConnectionFactory;
+
+            @WebServlet(value="/initServlet", loadOnStartup=1)
+            public class InitServlet extends HttpServlet {
+              private static final long serialVersionUID = 1L;
+              
+              public InitServlet() {
+                super();
+              }
+
+              public void init(ServletConfig config) throws ServletException {
+                try {
+                  DatabaseConnectionFactory.getConnectionFactory().init();
+                }catch (IOException e) {
+                  config.getServletContext().log(e.getLocalizedMessage(),e);
+                }
+              }
+
+            }
+        Note that we have used the @WebServlet annotation to mark this class as a servlet and the
+        loadOnStartup attribute is set to 1, to tell the web container to load this servlet at startup.
+        Now, we can call the following statement to get the Connection object from anywhere in the application:
+          -> Connection con = DatabaseConnectionFactory.getConnectionFactory().getConnection();
+      Saving a course in a database table using JDBC
+        We will create Course Data Access Object (CourseDAO), which will have the functions required to directly 
+        interact with the database. We are thus separating the code to access the database from the UI and business code.
+          //CourseDAO.java
+            org.javaskills.dao;
+    
+            import java.sql.Connection;
+            import java.sql.PreparedStatement;
+            import java.sql.ResultSet;
+            import java.sql.SQLException;
+            import java.sql.Statement;
+            import org.javaskills.bean.Course;
+            import org.javaskills.db.connection.DatabaseConnectionFactory;
+    
+            public class CourseDAO {
+              public static void addCourse (Course course) throws SQLException {
+                //get connection from connection pool
+                Connection con = DatabaseConnectionFactory.getConnectionFactory().getConnection();
+                try {
+                  final String sql = "insert into Course (name, credits) values (?,?)";
+                  //create the prepared statement with an option to get auto-generated keys
+                  PreparedStatement stmt = con.prepareStatement(sql,
+                  Statement.RETURN_GENERATED_KEYS);
+                  
+                  //set parameters
+                  stmt.setString(1, course.getName());
+                  stmt.setInt(2, course.getCredits());
+                  stmt.execute();
+                  
+                  //Get auto-generated keys
+                  ResultSet rs = stmt.getGeneratedKeys();
+                  if (rs.next())
+                    course.setId(rs.getInt(1));
+                  rs.close();
+                  stmt.close();
+                }finally {
+                  con.close();
+                }
+              }
+            }
+        Somehow, addCourse.jsp needs to send the form data to CourseDAO in order to save the data to the database. 
+        addCourse.jsp already has access to the Course bean and saves the form data in it. 
+        So, it makes sense for the Course bean to interface between addCourse.jsp and CourseDAO.
+          //Course.java
+            package org.javaskills.bean;
+
+            import org.javaskills.dao.CourseDAO;
+            import java.sql.SQLException;
+
+            public class Course {
+              private int id;
+              private String name;
+              private int credits;
+
+              private CourseDAO courseDAO = new CourseDAO(); //v2
+
+              public int getId() {
+                return id;
+              }
+              public void setId(int id) {
+                this.id = id;
+              }
+
+              public String getName() {
+                return name;
+              }
+              public void setName(String name) {
+                this.name = name;
+              }
+
+              public int getCredits() {
+                return credits;
+              }
+              public void setCredits(int credits) {
+                this.credits = credits;
+              }
+
+              public boolean isValidCourse() {
+                return name != null && credits != 0;
+              }
+              
+              public void addCourse() throws SQLException {  //v2
+                courseDAO.addCourse(this);                   //v2
+              }                                              //v2
+            }
+        We will then modify addCourse.jsp to call the addCourse method of the Course bean. 
+        We will have to add the code for this after the form is submitted and the data is validated:
+          //addCourse.jsp
+            <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1"%>
+            <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+            <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+            <html>
+            <head>
+            <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+            <title>Add Course</title>
+            </head>
+            <body>
+               <c:set var="errMsg" value="${null}" />
+               <c:set var="displayForm" value="${true}" />
+               <c:if test="${\"POST\".equalsIgnoreCase(pageContext.request.method) && pageContext.request.getParameter(\"submit\") != null}">
+                 <jsp:useBean id="courseBean" class="org.javaskills.bean.Course">
+                   <c:catch var="beanStorageException">
+                     <jsp:setProperty name="courseBean" property="*" />
+                   </c:catch>
+                 </jsp:useBean>
+                 <c:choose>
+                   <c:when test="${!courseBean.isValid() || beanStorageException != null}">
+                     <c:set var="errMsg" value="Invalid course details. Please try again" />
+                   </c:when>
+                   <c:otherwise>
+                     <!-- version2 -->
+                     <c:catch var="addCourseException">
+                   ${courseBean.addCourse()}
+                 </c:catch>
+                 <c:choose>
+                   <c:when test="${addCourseException != null}">
+                     <c:set var="errMsg" value="${addCourseException.message}"/>
+                   </c:when>
+                   <c:otherwise>
+                     <c:redirect url="listCourse.jsp"/>
+                   </c:otherwise>
+                 </c:choose>
+                 <!-- version2 -->
+                   </c:otherwise>
+                 </c:choose>
+               </c:if>
+
+               <h2>Add Course:</h2>
+               <c:if test="${errMsg != null}">
+                 <span style="color:red"><c:out value="${errMsg}" /></span>
+               </c:if>
+               <form method="post">
+                 Name: <input type="text" name="name" /><br />
+                 Credits: <input type="text" name="credits"><br />
+                 <button type="submit" name="submit">Add</button>
+               </form>
+              </body>
+            </html>
+      Getting courses from the database table using JDBC
+        Add getCourses to CourseDAO
+          //CourseDAO
+            package org.javaskills.dao;
+
+            import java.sql.Connection;
+            import java.sql.PreparedStatement;
+            import java.sql.ResultSet;
+            import java.sql.SQLException;
+            import java.sql.Statement;
+            import org.javaskills.bean.Course;
+            import org.javaskills.bean.Teacher;
+            import org.javaskills.db.connection.DatabaseConnectionFactory;
+            import java.util.List;
+            import java.util.ArrayList;
+
+            public class CourseDAO {
+
+              public static void addCourse (Course course) throws SQLException {
+                //get connection from connection pool
+                Connection con = DatabaseConnectionFactory.getConnectionFactory().getConnection();
+                try {
+                  final String sql = "insert into Course (name, credits) values (?,?)";
+                  //create the prepared statement with an option to get auto-generated keys
+                  PreparedStatement stmt = con.prepareStatement(sql,
+                  Statement.RETURN_GENERATED_KEYS);
+                  
+                  //set parameters
+                  stmt.setString(1, course.getName());
+                  stmt.setInt(2, course.getCredits());
+                  stmt.execute();
+                  
+                  //Get auto-generated keys
+                  ResultSet rs = stmt.getGeneratedKeys();
+                  if (rs.next())
+                    course.setId(rs.getInt(1));
+                  rs.close();
+                  stmt.close();
+                }finally {
+                  con.close();
+                }
+              }
+
+              
+              public List<Course> getCourses () throws SQLException {
+              //get connection from connection pool
+              Connection con =
+              DatabaseConnectionFactory.getConnectionFactory().getConnection();
+              List<Course> courses = new ArrayList<Course>();
+              Statement stmt = null;
+              ResultSet rs = null;
+              try {
+                stmt = con.createStatement();
+                
+                //create SQL statement using left outer join
+                StringBuilder sb = new StringBuilder()
+                .append("SELECT   course.id          AS courseId")
+                .append("        ,course.name      AS courseName")
+                .append("        ,course.credits     AS credits")
+                .append("        ,Teacher.id     AS teacherId")
+                .append("        ,Teacher.first_name AS firstName")
+                .append("        ,Teacher.last_name  AS lastName")
+                .append("        ,Teacher.designation designation ")
+                .append(" FROM    Course LEFT OUTER JOIN Teacher")
+                .append("   ON    course.Teacher_id = Teacher.id ")
+                .append("ORDER BY course.name");
+                
+                //execute the query
+                rs = stmt.executeQuery(sb.toString());
+                
+                //iterate over result set and create Course objects add them to course list
+                while (rs.next()) {
+                  Course course = new Course();
+                  course.setId(rs.getInt("courseId"));
+                  course.setName(rs.getString("courseName"));
+                  course.setCredits(rs.getInt("credits"));
+                  courses.add(course);
+                  int teacherId = rs.getInt("teacherId");
+                
+                  //check whether teacher id was null in the table
+                  if (rs.wasNull()) //no teacher set for this course.
+                    continue;
+                  Teacher teacher = new Teacher();
+                  teacher.setId(teacherId);
+                  teacher.setFirstName(rs.getString("firstName"));
+                  teacher.setLastName(rs.getString("lastName"));
+                  teacher.setDesignation(rs.getString("designation"));
+                  course.setTeacher(teacher);
+                }
+                return courses;
+              }
+              finally {
+                try {if (rs != null) rs.close();} catch (SQLException e) {}
+                try {if (stmt != null) stmt.close();} catch (SQLException e) {}
+                try {con.close();} catch (SQLException e) {}
+              }
+              }
+            }
+        Add getCourses to Course
+          //Course
+            package org.javaskills.bean;
+
+            import org.javaskills.dao.CourseDAO;
+            import java.sql.SQLException;
+            import java.util.List;
+
+            public class Course {
+              private int id;
+              private String name;
+              private int credits;
+
+              private CourseDAO courseDAO = new CourseDAO(); //v2
+
+              public int getId() {
+                return id;
+              }
+              public void setId(int id) {
+                this.id = id;
+              }
+
+              public String getName() {
+                return name;
+              }
+              public void setName(String name) {
+                this.name = name;
+              }
+
+              public int getCredits() {
+                return credits;
+              }
+              public void setCredits(int credits) {
+                this.credits = credits;
+              }
+              
+              public boolean isValidCourse() {
+                return name != null && credits != 0;
+              }
+              
+              public void addCourse() throws SQLException {  //v2
+                courseDAO.addCourse(this);                   //v2
+              }                                              //v2
+              
+              public List<Course> getCourses() throws SQLException { //v3
+              return courseDAO.getCourses();                       //v3
+              }                                                      //v3
+            }
+        Now, listCourses needs to add this functionality
+          //listCourse.jsp
+            <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" %>
+            <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+            <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+            <html>
+              <head>
+                <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+                <title>List Courses</title>
+              </head>
+              <body>
+                <c:catch var="err">
+                <jsp:useBean id="courseBean" class="org.javaskills.bean.Course"/>
+                <c:set var="courses" value="${courseBean.getCourses()}"/>
+              </c:catch>
+              <c:choose>
+                <c:when test="${err != null}">
+                  <c:set var="errMsg" value="${err.message}"/>
+                </c:when>
+                <c:otherwise>
+                </c:otherwise>
+              </c:choose>
+              <h2>Courses:</h2>
+              <c:if test="${errMsg != null}">
+                <span style="color: red;">
+                  <c:out value="${errMsg}"></c:out>
+                </span>
+              </c:if>
+              <table>
+                <tr>
+                  <th>Id</th>
+                  <th>Name</th>
+                  <th>Credits</th>
+                  <th>Teacher</th>
+                </tr>
+                <c:forEach items="${courses}" var="course">
+                  <tr>
+                  <td>${course.id}</td>
+                  <td>${course.name}</td>
+                  <td>${course.credits}</td>
+                    <c:choose>
+                    <c:when test="${course.teacher != null}">
+                      <td>${course.teacher.firstName}</td>
+                    </c:when>
+                    <c:otherwise>
+                      <td></td>
+                      </c:otherwise>
+                    </c:choose>
+                    </tr>
+                </c:forEach>
+              </table>
+              </body>
+             </html>
+    Completing the add Course functionality
+      Add teacherId field to Course Class
+        //Course
+          package org.javaskills.bean;
+
+          import org.javaskills.dao.CourseDAO;
+          import java.sql.SQLException;
+          import java.util.List;
+
+          public class Course {
+            private int id;
+            private String name;
+            private int credits;
+            private int teacherId;  //v4
+            private CourseDAO courseDAO = new CourseDAO(); //v2
+
+            public int getId() {
+              return id;
+            }
+            public void setId(int id) {
+              this.id = id;
+            }
+
+            public String getName() {
+              return name;
+            }
+            public void setName(String name) {
+              this.name = name;
+            }
+
+            public int getCredits() {
+              return credits;
+            }
+            public void setCredits(int credits) {
+              this.credits = credits;
+            }
+            //v4 >>>
+            public int getTeacherId() {
+            return teacherId;
+            }
+            public void setTeacherId(int teacherId) {
+            this.teacherId = teacherId;
+            }
+            // v4 <<<
+            public boolean isValidCourse() {
+              return name != null && credits != 0;
+            }
+            
+            public void addCourse() throws SQLException {  //v2
+              courseDAO.addCourse(this);                   //v2
+            }                                              //v2
+            
+            public List<Course> getCourses() throws SQLException { //v3
+            return courseDAO.getCourses();                       //v3
+            }                                                      //v3
+          }
+      Modify addCourse in CourseADO to save the teacher id for each course, if it is not zero.
+        //CourseDAO
+          package org.javaskills.dao;
+
+          import java.sql.Connection;
+          import java.sql.PreparedStatement;
+          import java.sql.ResultSet;
+          import java.sql.SQLException;
+          import java.sql.Statement;
+          import java.sql.Types;
+
+          import org.javaskills.bean.Course;
+          import org.javaskills.bean.Teacher;
+          import org.javaskills.db.connection.DatabaseConnectionFactory;
+          import java.util.List;
+          import java.util.ArrayList;
+
+          public class CourseDAO {
+
+            public void addCourse (Course course) throws SQLException {
+              //get connection from connection pool
+              Connection con = DatabaseConnectionFactory.getConnectionFactory().getConnection();
+              PreparedStatement stmt = null;
+              ResultSet rs = null;
+              try {
+                //final String sql = "insert into Course (name, credits) values (?,?)";
+                final String sql = "insert into Course (name, credits, Teacher_id ) values (?,?,?)";  //v4
+                //create the prepared statement with an option to get auto-generated keys
+                stmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                
+                //set parameters
+                stmt.setString(1, course.getName());
+                stmt.setInt(2, course.getCredits());
+                //v4 >>>
+                if (course.getTeacherId() == 0)
+                stmt.setNull(3, Types.INTEGER);
+                else
+                stmt.setInt(3,course.getTeacherId());
+                stmt.execute();
+                //v4 <<<
+                
+                //Get auto-generated keys
+                rs = stmt.getGeneratedKeys();
+                if (rs.next())
+                  course.setId(rs.getInt(1));
+
+              }finally {
+                rs.close();
+                stmt.close(); 
+                con.close();
+              }
+            }
+
+            
+            public List<Course> getCourses () throws SQLException {
+            //get connection from connection pool
+            Connection con = DatabaseConnectionFactory.getConnectionFactory().getConnection();
+            List<Course> courses = new ArrayList<Course>();
+            Statement stmt = null;
+            ResultSet rs = null;
+            try {
+              stmt = con.createStatement();
+              
+              //create SQL statement using left outer join
+              StringBuilder sb = new StringBuilder()
+              .append("SELECT   course.id           AS courseId")
+              .append("        ,course.name       AS courseName")
+              .append("        ,course.credits      AS credits")
+              .append("        ,Teacher.id      AS teacherId")
+              .append("        ,Teacher.first_name  AS firstName")
+              .append("        ,Teacher.last_name   AS lastName")
+              .append("        ,Teacher.designation AS designation")
+              .append(" FROM    Course LEFT OUTER JOIN Teacher")
+              .append("   ON    course.Teacher_id = Teacher.id ")
+              .append("ORDER BY course.name");
+              
+              //execute the query
+              rs = stmt.executeQuery(sb.toString());
+              
+              //iterate over result set and create Course objects add them to course list
+              while (rs.next()) {
+                Course course = new Course();
+                course.setId(rs.getInt("courseId"));
+                course.setName(rs.getString("courseName"));
+                course.setCredits(rs.getInt("credits"));
+                courses.add(course);
+                int teacherId = rs.getInt("teacherId");
+              
+                //check whether teacher id was null in the table
+                if (rs.wasNull()) //no teacher set for this course.
+                  continue;
+                Teacher teacher = new Teacher();
+                teacher.setId(teacherId);
+                teacher.setFirstName(rs.getString("firstName"));
+                teacher.setLastName(rs.getString("lastName"));
+                teacher.setDesignation(rs.getString("designation"));
+                course.setTeacherId(teacherId);
+              }
+              return courses;
+            }
+            finally {
+              try {if (rs != null) rs.close();} catch (SQLException e) {}
+              try {if (stmt != null) stmt.close();} catch (SQLException e) {}
+              try {con.close();} catch (SQLException e) {}
+            }
+            }
+          }
+      Implement TeacherDAO and add addTeacher & getTeachers methods in the teacher bean
+        //TeacherDAO
+          package org.javaskills.dao;
+
+          import java.sql.Connection;
+          import java.sql.Statement;
+          import java.sql.ResultSet;
+          import java.sql.PreparedStatement;
+          import java.sql.SQLException;
+          import java.util.List;
+          import java.util.ArrayList;
+          import org.javaskills.db.connection.DatabaseConnectionFactory;
+          import org.javaskills.bean.Teacher;
+
+          public class TeacherDAO {
+            
+            public void addTeacher(Teacher teacher) throws SQLException{
+              Connection con = DatabaseConnectionFactory.getConnectionFactory().getConnection();
+              PreparedStatement stmt = null;
+              ResultSet rs = null;
+              try{
+                final String sql = "INSERT INTO Teacher(first_name, last_name, designation) values(?, ?, ?)";
+                stmt = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                stmt.setString(1, teacher.getFirst_name());
+                stmt.setString(2, teacher.getLast_name());
+                stmt.setString(3, teacher.getDesignation());
+                stmt.execute();
+                
+                rs = stmt.getGeneratedKeys();
+                if(rs.next()){
+                  teacher.setId(rs.getInt(1));
+                }
+                
+              }finally{
+                try{ if(stmt != null){ stmt.close(); }}catch(SQLException exc){}
+                try{ if(rs != null){ rs.close(); }    }catch(SQLException exc){}
+                try{ con.close();                     }catch(SQLException exc){}
+                
+              }
+            }
+
+
+            public List<Teacher> getTeachers() throws SQLException{
+              Connection con = DatabaseConnectionFactory.getConnectionFactory().getConnection();
+              Statement stmt = null;
+              ResultSet rs = null;
+              List<Teacher> teachers = new ArrayList<Teacher>();
+              try{
+                stmt = con.createStatement();
+                StringBuilder sb = new StringBuilder();
+                sb.append("SELECT id          AS id");
+                sb.append("      ,first_name  AS firstName");
+                sb.append("      ,last_name   AS lastName");
+                sb.append("      ,designation AS designation");
+                sb.append(" FROM  Teacher");
+
+                rs = stmt.executeQuery(sb.toString());
+                
+                while(rs.next()){
+                  Teacher teacher = new Teacher();
+                  teacher.setId(rs.getInt("id"));
+                  teacher.setFirst_name(rs.getString("firstName"));
+                  teacher.setLast_name(rs.getString("lastName"));
+                  teacher.setDesignation(rs.getString("designation"));
+                  teachers.add(teacher);
+                }
+                return teachers;
+              }finally{
+                try{ if(stmt != null){stmt.close();}}catch(SQLException exc){}
+                try{ if(rs != null){rs.close();}    }catch(SQLException exc){}
+                try{ con.close();                   }catch(SQLException exc){}
+                
+              }
+            }
+
+          }
+        //Teacher
+          package org.javaskills.bean;
+
+          import org.javaskills.dao.TeacherDAO;
+          import java.sql.SQLException;
+          import java.util.List;
+
+          public class Teacher extends Person{
+            private int id;
+            private String first_name;
+            private String last_name;
+            private String designation;
+            private TeacherDAO teacherDAO = new TeacherDAO();
+
+            public int getId() {
+            return id;
+            }
+            public void setId(int id) {
+            this.id = id;
+            }
+            
+            public String getFirst_name() {
+            return first_name;
+            }
+            public void setFirst_name(String first_name) {
+            this.first_name = first_name;
+            }
+            
+            public String getLast_name() {
+            return last_name;
+            }
+            public void setLast_name(String last_name) {
+            this.last_name = last_name;
+            }
+
+            public String getDesignation(){
+            return designation;
+            }
+            public void setDesignation(String designation){
+              this.designation = designation;
+            }
+            
+            public void addTeacher() throws SQLException{
+             teacherDAO.addTeacher(this);
+            }
+            
+            public List<Teacher> getTeachers() throws SQLException{
+              return teacherDAO.getTeachers();
+            }
+          }
+      Modify addCourse.jsp
+        To display the drop-down list of teachers when adding a new course. We first need to get the list of teachers. 
+        Therefore, we will create a Teacher bean and call the getTeachers method on it.
+        //adCourse.jsp
+    Using Eclipse Data Source Explorer
+  Creating a database application using JPA
+    Creating the user interface for adding a course using JSF
+    JPA Concepts
+    Entity
+    Entity Manager
+    Entity Manager Factory
+    Creating a JPA application
+    Creating a new MySQL schema
+    Setting up a Maven dependency for JPA
+    Converting a project into a JPA project
+    Creating entities
+    Configuring entity relationships
+    Configuring a many-to-one relationship
+    Creating a many-to-many relationship
+    Creating database tables from entities
+    Using JPA APIs to manage data
+    Writing the user interface with a JPA service class
+
+5.Unit Testing
+6.Debugging a JEE Application
+7.Creating JEE Applications with EJB
+8.Creating Web Application with Spring MVC
+9.Creating Web Services
+10.Asynchronous Programming with JMS
+11.Java CPU Profiling and Memory Tracking
