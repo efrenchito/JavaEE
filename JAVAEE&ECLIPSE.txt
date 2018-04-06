@@ -6,8 +6,8 @@ https://crunchify.com/ever-wondered-difference-between-dynamic-web-module-3-0-an
    JEE is a collection of many different specifications intended to perform specific tasks.
    JEE specifications can be broadly classified in the following groups:
     PRESENTATION LAYER
-     JEE specifications or technologies in this group receive the request from web server and send back the response HTML/JSON/XML.
-     -> Servlets, JSP, JSF
+     JEE spec. or technologies in this group receive the request from web server and send back the response HTML/JSON/XML.
+     -> Servlets, JSP, JSTL, JSF
     BUSINESS LAYER: 
      Handle the business logic of your application generally the request to this layer comes from 
      the Presentation Layer/Middle Layer (Web Services). 
@@ -553,8 +553,8 @@ https://crunchify.com/ever-wondered-difference-between-dynamic-web-module-3-0-an
 @3.Source Control Management in Eclipse
   Source Control Management (SCM) is an essential part of software development. 
   By using SCM tools, you make sure that you have access to versions of your code at important milestones.
-  Eclipse has had support for integrating various SCM tools for a long time – this includes support for CVS, Microsoft Source 
-  Safe, Perforce, and Subversion (SVN). The recent versions of Eclipse have built in support for Git too.
+  Eclipse has had support for integrating various SCM tools for a long time – this includes support for: 
+    CVS, Microsoft Source Safe, Perforce, Subversion (SVN), the recent versions of Eclipse have built in support for Git too.
   For more information about Eclipse Git plugin, refer to -> https://wiki.eclipse.org/EGit/User_Guide.
   -> The Eclipse Subversion plugin
     Create SVN Repository
@@ -673,6 +673,7 @@ https://crunchify.com/ever-wondered-difference-between-dynamic-web-module-3-0-an
       In the Package Explorer, right-click on the project and select Team | Remote | Configure Fetch from Upstream.
       ...
     Cloning a Remote repository...
+
 @4.Creating a JEE Database Application
   Overview
     Most web applications today require access to a database. 
@@ -840,7 +841,8 @@ https://crunchify.com/ever-wondered-difference-between-dynamic-web-module-3-0-an
         => Right-click [Project]>WebContent>WEB-INF>lib
             Import>General>File System Browse for jstl-api.1.2.2.jar & jstl-1.2.1.jar
       2. Add a declaration for JSTL in your JSP.
-        <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>  
+        <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+        ...
     Creating Java Beans for data storage
       //Course.java
         package org.javaskills.bean;
@@ -1895,7 +1897,6 @@ https://crunchify.com/ever-wondered-difference-between-dynamic-web-module-3-0-an
              URL: jdbc:mysql://localhost:3306/course_management
              User name: root
              -> Click Next and Finish
-
   Creating a database application using JPA
     Create Maven Project
      JPA is an ORM framework, which is now part of the JEE specification. At the time of writing, it is in version 2.1. 
@@ -1910,7 +1911,7 @@ https://crunchify.com/ever-wondered-difference-between-dynamic-web-module-3-0-an
         javax.servlet:javax.servlet-api:3.1.0
         com.sun.faces:jsf-api:2.2.9
         com.sun.faces:jsf-impl:2.2.9
-      Add src/main/webapp/WEB-INF/web.xml
+      Add servlet FacesServlet (load-on-startup = 1) web.xml
         //web.xml
           <servlet>
             <servlet-name>JSFServlet</servlet-name>
@@ -2693,6 +2694,181 @@ https://crunchify.com/ever-wondered-difference-between-dynamic-web-module-3-0-an
          Once the script ID is run successfully, open the Data Source Explorer view 
          -> see Using Eclipse Data Source Explorer section
     Using JPA APIs to manage data
+      We will now create classes that use JPA APIs to manage data for our application:
+      We will create service classes for the Course, Teacher, and Student entities and add methods that directly access 
+      the database though JPA APIs. To cache an instance of EntityManagerFactory, we will create another Managed Bean, whose only job is to make the EntityManagerFactory instance available to other Managed Beans.
+        //EntityManagerFactoryBean.java
+          package org.javaskills.jpa.service_bean;
+          
+          import javax.faces.bean.ApplicationScoped;
+          import javax.faces.bean.ManagedBean;
+          import javax.persistence.EntityManagerFactory;
+          import javax.persistence.Persistence;
+
+          //Load this bean eagerly, i.e., before any request is made
+          @ManagedBean(name="emFactoryBean", eager=true)
+          @ApplicationScoped
+          public class EntityManagerFactoryBean {
+            
+            private EntityManagerFactory entityManagerFactory;
+
+            public EntityManagerFactoryBean() {
+              entityManagerFactory = Persistence.createEntityManagerFactory("CourseManagementJPA");
+              //CourseManagement is the persistence unit in the persistence.xml file
+            }
+            public EntityManagerFactory getEntityManagerFactory() {
+              return entityManagerFactory;
+            }
+          }
+        //CourseService.java
+          package org.javaskills.jpa.service;
+
+          import org.javaskills.jpa.service_bean.EntityManagerFactoryBean;
+          import org.javaskills.jpa.bean.Course;
+          import javax.jpa.EntityManager;
+          import javax.jpa.CriteriaBuilder;
+          import javax.jpa.CriteriaQuery;
+          import javax.jpa.TypedQuery;
+          import java.util.List;
+
+          public class CourseService{
+            private EntityManagerFactory factory;
+            
+            public CourseService(EntityManagerFactoryBean factoryBean){
+              this.factory = factoryBean.getEntityManagerFactory();
+            }
+
+            pubilc List<Course> getCourses(){
+              EntityManager em = factory.createEntityManager();
+              CriteriaBuilder cb = em.getCriteriaBuilder();
+              CriteriaQuery<Course> cq = cb.createQuery(Course.class);
+              TypedQuery<Course> tq = em.createQuery(cq);
+              List<Course> courses = tq.getResultList();
+              em.close();
+              return courses;
+            }
+
+            public void addCourse(Course course){
+              EntityManager em = factory.createEntityManager();
+              EntityTransaction txn = em.getTransaction();
+              txn.begin();
+              em.persist(course);
+              txn.commit();
+            }
+
+            public Course getCourse(int id){
+              EntityManager em = factory.createEntityManager();
+              return em.find(Course.class, id);
+            }
+
+            public void updateCourse(Course course){
+              EntityManager em = factory.createEntityManager();
+              EntityTransaction txn = em.getTransaction();
+              txn.begin();
+              em.merge(course);
+              txn.close();
+            }
+
+            public void deleteCourse(Course course){
+              EntityManager em = factory.createEntityManager();
+              EntityTransaction txn = em.getTransaction();
+              txn.begin();
+              Course mergedCourse = em.find(Course.class, course.getId());
+              em.remove(mergedCourse);  
+              txn.commit();
+            }
+
+          }
+        //StudentService.java
+          package org.javaskills.jpa.service;
+
+          import org.javaskills.jpa.service_bean.EntityManagerFactoryBean;
+          import org.javaskills.bean.Student;
+          import javax.jpa.EntityManagerFactory;
+          import javax.jpa.EntityManager;
+          import javax.jpa.CriteriaBuilder;
+          import javax.jpa.CriteriaQuery;
+          import javax.jpa.TypedQuery;
+
+          public class StudentService{
+            private EntityManagerFactory factory;
+
+            public StudentService(EntityManagerFactoryBean factoryBean ){
+              this.factory = factoryBean.getEntityManagerFactory();
+            }
+
+            public List<Student> getStudents(){
+              EntityManager em = factory.createEntityManager();
+              CriteriaBuilder cb = em.getCriteriaBuilder();
+              CriteriaQuery<Student> cq = cb.createQuery(Student.class);
+              TypedQuery<Student> tq = em.createQuery(cq);
+              List<Student> students = tq.getResultList();
+              em.close();
+              return students;
+            }
+
+            public void addStudent(Student student){
+              EntityManager em = factory.createEntityManager();
+              EntityTransaction txn = em.getTransaction();
+              txn.begin();
+              em.persist(student);
+              txn.commit();
+            }
+          }
+        //TeacherService
+          package org.javaskills.jpa.service;
+
+          import org.javaskills.jpa.service_bean.EntityManagerFactoryBean;
+          import org.javaskills.jpa.bean.Teacher;
+          import javax.jpa.EntityManagerFactory;
+          import javax.jpa.EntityManager;
+          import javax.jpa.EntityTransaction;
+          import javax.jpa.CriteriaBuilder;
+          import javax.jpa.CriteriaQuery;
+          import javax.jpa.TypedQuery;
+
+          public class TeacherService{
+            private EntityManagerFactory factory;
+
+            public TeacherService(){
+              this.factory = EntityManagerFactoryBean.getEntityManagerFactory();
+            }
+
+            public List<Teacher> getTeachers(){
+              EntityManager em = factory.createEntityManager();
+              CriteriaBuilder cb = em.getCriteriaBuilder();
+              CriteriaQuery<Teacher> cq = cb.createQuery(Teacher.class);
+              TypedQuery<Teacher> tq = em.creteQuery(cq);
+              List<Teacher> teachers = tq.getResultList();
+              em.close();
+              return teachers;
+            }
+
+            public void addTeacher(Teacher teacher){
+              EntityManager em = factory.createEntityManager();
+              EntityTransaction txn = em.getTransaction();
+              txn.begin();
+              em.persist(teacher);
+              txn.commit();
+            }
+
+            public Teacher getTeacher(int id){
+              EntityManager em = factory.createEntityManager();
+              return em.find(Teacher.class, id);
+            }
+
+          }
+      Notice how we used the JPA-Criteria APIs -> http://docs.oracle.com/javaee/7/tutorial/persistence-criteria.htm#GJITV
+      we could have done this using Java Query Language(JQL), but it's not type safe.  
+      -> http://www.oracle.com/technetwork/articles/vasiliev-jpql-087123.html
+        ...
+          public List<Course> getCourses() {
+            EntityManager em = factory.createEntityManager();
+            List<Course> courses = em.createQuery("select crs from Course crs").getResultList();
+            em.close();
+            return courses;
+          }
+        ...
     Writing the user interface with a JPA service class
 
 5.Unit Testing
