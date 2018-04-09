@@ -2874,6 +2874,245 @@ https://crunchify.com/ever-wondered-difference-between-dynamic-web-module-3-0-an
 5.Unit Testing
 6.Debugging a JEE Application
 7.Creating JEE Applications with EJB
+  ...
+  Accessing session bean from the client
+    Overview
+      Session beans can be designed to be accessed:
+       Locally  -> session beans can implement a LOCAL INTERFACE or NO-INTERFACE
+       Remotely -> session beans require to implement a REMOTE INTERFACE
+    Creating a NO-INTERFACE session
+      //StudentLocalStatefulBean
+        import javax.ejb.LocalBean;
+        import javax.ejb.Singleton;
+
+        @Singleton
+        @LocalBean
+        public class Student {
+          ...
+        }
+    Accessing session bean using dependency injection
+      You can access session beans by either using the @EJB annotation (for DI) or performing the JNDI lookup.
+      Dependency injection of session beans using @EJB works only for managed components. 
+        -> (Components whose lifecycle is managed by the container)
+      //StudentJSFBean
+        import javax.ejb.EJB;
+        import javax.faces.bean.ManagedBean;
+        @ManagedBean
+        public class StudentJSFBean {
+          @EJB
+          private Student studentEJB;
+        }
+    Creating session bean using the local business interface
+      //StudentLocal
+        import java.util.List;
+        import javax.ejb.Local;
+        @Local
+        public interface StudentLocal {
+          public List<Course> getCourses();
+        }
+      //Student -> session bean implementation
+        import java.util.List;
+        import javax.ejb.Local;
+        import javax.ejb.Stateful;
+        @Stateful
+        @Local
+        public class Student implements StudentLocal {
+          @Override
+          public List<CourseDTO> getCourses() {
+            //get courses are return
+            …
+          }
+        }
+      //StudentJSFBean -> Access the Student EJB throught the local interface
+        import javax.ejb.EJB;
+        import javax.faces.bean.ManagedBean;
+        @ManagedBean
+        public class StudentJSFBean {
+          @EJB
+          private StudentLocal student;
+        }
+    Accessing a session bean using the JNDI lookup
+      https://docs.oracle.com/javase/tutorial/jndi/
+      JEE applications could be packaged in EAR which contains a .jar file for EJBs and a .war file for web applications
+      (and a lib folder containing libraries required for both).
+      1. A global JNDI URL for EJB:
+        "java:global/<application_name>/<module_name>/<bean_name>![<bean_interface>]"
+          -> java:global indicates that it is a global JNDI URL.
+          -> <application_name> is typically the name of the EAR file.
+          -> <module_name> is the name of the EJB JAR.
+          -> <bean_name> is the name of the EJB bean class.
+          -> <bean_interface> is optional if EJB has a no-interface view, or if EJB implements only one business interface. 
+             Else, it is a fully qualified name of a business interface.
+      2. EJB containers are also required to publish two more variations of JNDI URLs for each EJB.
+        "java:app/[<module_name>]/<bean_name>![<bean_interface>]" -> If the EJB client is in the same application.
+        "java:module/<bean_name>![<bean_interface>]" -> If the client is in the same module (The same .jar as the EJB)
+      3. Before you look up any URL in a JNDI server, you need to create InitialContext.
+        ...
+          InitialContext initCtx = new InitialContext();
+          Object obj = initCtx.lookup("jndi_url");
+        ...
+      => JNDI lookup
+        InitialContext ctx = new InitialContext();
+        StudentLocal student = (StudentLocal) ctx.loopup("java:app/CourseManagementEJBs/Student");
+        return student.getCourses(id) ; //get courses from Student EJB
+    Creating session bean using a remote business interface
+      //StudentRemote
+        import java.util.List;
+        import javax.ejb.Remote;
+        @Remote
+        public interface StudentRemote {
+          public List<CourseDTO> getCourses();
+        }
+      //Student -> EJB implementing the remote interface
+        @Stateful
+        @Remote
+        public class Student implements StudentRemote {
+          @Override
+          public List<CourseDTO> getCourses() {
+            //get courses are return
+            …
+          }
+        }
+      //Student -> Remote EJB injected into Managed objects
+        import javax.ejb.EJB;
+        import javax.faces.bean.ManagedBean;
+        @ManagedBean
+        public class StudentJSFBean {
+          @EJB
+          private StudentRemote student;
+        }
+    Accessing a remote session bean
+      To access EJBs from a remote client, you need to use a JNDI lookup method. 
+      Further, you need to set up InitialContext with certain properties; some of them are JEE application server specific.
+        ...
+          Properties jndiProperties = new Properties();
+          jndiProperties.setProperty("org.omg.CORBA.ORBInitialHost", "<remote_host>");
+          //target ORB port. default is 3700 in Glassfish
+          jndiProperties.setProperty("org.omg.CORBA.ORBInitialPort", "3700");
+
+          InitialContext ctx = new InitialContext(jndiProperties);
+          StudentRemote student = (StudentRemote)ctx.lookup("java:app/CourseManagementEJBs/Student");
+          return student.getCourses();
+        ...
+        JNDI URLs
+          java:global/CourseManagement/CourseManagementEJBs/Student!packt.jee.book.ch6.StudentRemote
+          java:global/CourseManagement/CourseManagementEJBs/Student
+          java:app/CourseManagementEJBs/Student
+          java:app/CourseManagementEJBs/Student!packt.jee.book.ch6.StudentRemote
+          java:module/Student
+          java:module/Student!packt.jee.book.ch6.StudentRemote
+  Configuring the GlassFish server in Eclipse
+    1.[Java EE perspective] Right-click in the Servers view and select New | Server.
+    2.Select the GlassFish 4 server and click Next.
+      GlassFish runtime properties
+        Name: GlassFish 4
+        Server root: C:\Program Files\glassfish-4.1.1\glassfish
+        Java Development Kit: Java SE 8[1.8.0_11] (Eclipse Default)
+      GlassFish Application Server Properties
+        Domain Path: ...
+        Admin name: admin
+        Admin password: 
+        Debug port: 8009
+        [check] Preserve sessions across redeployment
+        [uncheck] Use JAR archives for deployment
+      => Finish
+  Creating the CourseManagement application using EJB
+    Creating an EJB project in Eclipse
+      EJBs are packaged in a JAR file. Web applications are packaged in a WAR.
+      If EJBs are to be accessed remotely, then the client needs to have access to business interfaces. 
+      Therefore, EJB business interfaces and shared objects are packaged in a separate JAR, called EJB client JAR.
+      If EJB and the web application are to be deployed as one single application, then they need to be packaged in EAR
+      In most cases an application with EJBs is not a single project but four different projects:
+        1. EJB project that creates EJB JAR.
+        2. EJB client project that contains business classes and shared (between EJB and client) classes.
+        3. Web project that generates WAR.
+        4. EAR project that generates EAR containing EBJ JAR, EJB client JAR, and WAR.
+      You can create each of these projects independently and integrate them. 
+      However, Eclipse gives you the option to create an EJB project, an EJB client project, and an EAR project with one wizard.
+        1.Select File> New> 'EJB Project'
+          EJB Project
+            Project Name: 'CourseManagementEJBs'
+            Project Location: -> Use default location
+            Target runtime: GlassFish4
+            EJB module version: 3.2
+            Configuration: Default Configuration for GlassFish 4.
+            EAR Membership
+              [check] Add project to an EAR
+              EAR Project Name: CourseManagementEJBsEAR
+            -> Next
+          Java (Configure Project for building application)
+            Source folders on build path: ejbModule
+            Default output folder: build/classes
+            -> Next
+          EJB Module (Configure EJB module settings)
+            [check] Create an EJB Client JAR module to hold the client interfaces and classes
+            Name: CourseManagementEJBsClient
+            Client JAR URI: CourseManagementEJBsClient.jar
+            => Finish
+        ...Since we're building a web application:
+        2.Select File> New: 'Dynamic Web Project'
+            Project Name: 'CourseManagementWeb'
+            Project Location: -> Use default location
+            Dynamic web module version: 3.1
+            Configuration: Default Configuration for GlassFish 4
+            EAR Membership
+              [check] Add project to an EAR
+              EAR Project Name: CourseManagementEJBsEAR
+      =>
+        In the course management application, we will create a stateless EJB called CourseBean.
+        We will use JPA for data access and create Course entity.
+        The CourseManagementEJBClient project will contain the EJB business interface and shared classes.
+        In CourseManagementWeb, we will create a JSF page and a managed bean that will access Course EJB 
+        in the CourseManagementEJBs project to get a list of courses.
+    Configuring datasource in GlassFish 4
+      The GlassFish 4 server is not packaged with the JDBC driver for MySQL.
+      So, we need to place the .jar file for MySQLDriver in the path where GlassFish can find it.
+      Copy the MySQL JDBC Driver JAR in <glassfish_home>/glassfish/domains/domain1/lib/ext.
+      -> http://dev.mysql.com/downloads/connector/j/
+      1. Open the GlassFish admin console:
+        Right-click Servers view and select GlassFish>View Admin Console or browsing http://localhost:4848
+        Select Resources | JDBC | JDBC Connection Pools -> New
+          Pool Name: MySQLconnectionPool
+          Resource Type: javax.sql.DataSource
+          Database Driver Vendor: MySql
+          -> Next
+          DataSource Classname: com.mysql.jdbc.jdbc2.optional.MysqlDatasource
+          Additional Properties
+            Port/Port Number: 3306
+            DatabaseName: course_management
+            Password: MySQL database password
+            URL: jdbc:mysql://:3306/course_management
+            Server Name: localhost
+            User: <user_name>
+          => Finish
+      2. We need to craete a JNDI resource for this connection pool.
+        Select Resources | JDBC | JDBC Resources -> New
+          JNDI Name: jdbc/CourseManagement
+          Pool Name: 'MySQLconnectionPool'
+          -> Save
+    Configuring JPA
+      We will now configure our EJB project to use JPA to access the MySQL database.
+      1. Right-click CourseManagementEJBs project -> Configure | Convert to JPA Project.
+        Project Facets (Select the facets that should be enabled for this project)
+          EJB Module 3.2
+          GlassFish EJB Extensions 4.0
+          Java 1.8
+          JPA 2.1
+          -> Next
+        JPA Facet (Configure JPA settings)
+          Platform: Generic 2.1
+          JPA Implementation: GlassFish System Library
+          -> Finish
+        => Eclipse adds persistence.xml (ejbModule/META-INF)
+
+
+
+    Creating a JPA entity
+    Creating stateless EJB
+    Creating JSF and managed bean
+    Running the example
+    Creating EAR for deployment outside Eclipse
+    Creating a JEE project using Maven
 8.Creating Web Application with Spring MVC
 9.Creating Web Services
 10.Asynchronous Programming with JMS
